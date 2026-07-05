@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vektor - Quiz Multiverse</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        /* Deep space gradient background canvas */
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #0a0f1d 0%, #03050a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient Nebula Gas Layer */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 15% 20%, rgba(112, 0, 255, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(0, 242, 254, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 50% 10%, rgba(232, 93, 68, 0.08) 0%, transparent 40%);
+            filter: blur(50px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Dynamic Star Field Layer */
+        .star-field {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .star-field::after {
+            content: '';
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 
+                10vw 15vh 1px #fff, 25vw 35vh 2px #fff, 85vw 12vh 1px #fff,
+                5vw 65vh 2px #fff, 40vw 50vh 1px #fff, 75vw 70vh 2px #fff,
+                20vw 85vh 1px #fff, 60vw 92vh 2px #fff, 92vw 55vh 1px #fff,
+                15vw 40vh 1px #fff, 55vw 78vh 2px #fff, 80vw 35vh 1px #fff,
+                33vw 65vh 1px #fff, 68vw 18vh 2px #fff, 95vw 88vh 1px #fff;
+            animation: spaceTwinkle 4s ease-in-out infinite alternate;
+        }
+        @keyframes spaceTwinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* ========================================================
+           CELESTIAL BACKGROUND OBJECTS (BLACK HOLE & PLANETS)
+           ======================================================== */
+        .space-object {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Swirling Black Hole (Top Left) */
+        .black-hole {
+            top: 15vh;
+            left: 5vw;
+            width: 90px;
+            height: 90px;
+            background: #000;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #000, 0 0 40px #7000ff, 0 0 60px #ff007f;
+            animation: floatingGlow 6s infinite ease-in-out;
+        }
+        .black-hole::before {
+            content: '';
+            position: absolute;
+            top: -12px; left: -12px; right: -12px; bottom: -12px;
+            border: 3px double rgba(0, 242, 254, 0.4);
+            border-radius: 50%;
+            border-left-color: transparent;
+            border-right-color: transparent;
+            animation: rotateRing 8s infinite linear;
+        }
+
+        /* Ringed Gas Giant Planet (Bottom Right) */
+        .gas-giant {
+            bottom: 12vh;
+            right: 5vw;
+            width: 95px;
+            height: 95px;
+            background: linear-gradient(135deg, #ff7a63 0%, #7000ff 100%);
+            border-radius: 50%;
+            box-shadow: inset -15px -15px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255, 122, 99, 0.3);
+        }
+        .gas-giant::before {
+            content: '';
+            position: absolute;
+            top: 38px; left: -35px;
+            width: 165px;
+            height: 20px;
+            border: 6px solid rgba(255, 255, 255, 0.15);
+            border-top-color: transparent;
+            border-radius: 50%;
+            transform: rotate(-15deg);
+        }
+
+        /* Distant Dark Outpost Moon (Top Right) */
+        .mystic-moon {
+            top: 15vh;
+            right: 8vw;
+            width: 35px;
+            height: 35px;
+            background: #2d3748;
+            border-radius: 50%;
+            box-shadow: inset -8px -8px 15px rgba(0,0,0,0.9), 0 0 10px rgba(0, 242, 254, 0.15);
+        }
+
+        /* Streaking Comet (Top Center) */
+        .comet {
+            top: 6vh;
+            left: 45vw;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px 2px #fff;
+            animation: shootComet 12s infinite linear;
+            opacity: 0;
+        }
+        .comet::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 2px;
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(to left, rgba(255,255,255,0.7), transparent);
+            transform: translateY(-50%) rotate(-25deg);
+            transform-origin: left center;
+        }
+
+        /* Spinning Spiral Galaxy (Middle Left) */
+        .spiral-galaxy {
+            top: 48vh;
+            left: 3vw;
+            width: 70px;
+            height: 30px;
+            background: radial-gradient(ellipse at center, rgba(0, 242, 254, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(2px);
+            transform: rotate(-30deg);
+            animation: rotateRing 25s infinite linear;
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.4);
+        }
+
+        /* Glowing Star Cluster (Middle Right) */
+        .star-cluster {
+            top: 50vh;
+            right: 4vw;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            box-shadow: 
+                5px 5px 2px #00ffff, -8px 12px 1px #fff, 12px -5px 3px rgba(0,242,254,0.7),
+                -3px -8px 2px #fff, 8px 15px 1px rgba(112, 0, 255, 0.6);
+            filter: blur(1px);
+            animation: floatingGlow 5s infinite ease-in-out alternate;
+        }
+
+        /* Fiery Solar Flare Star (Bottom Left) */
+        .solar-star {
+            bottom: 8vh;
+            left: 8vw;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at center, #fff 20%, #ff7a63 60%, #e85d44 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 25px #ff7a63, 0 0 45px rgba(232, 93, 68, 0.5);
+            animation: floatingGlow 7s infinite ease-in-out;
+        }
+
+        /* CSS Animations for Space Elements */
+        @keyframes rotateRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes floatingGlow {
+            0% { transform: translateY(0px); filter: brightness(1); }
+            50% { transform: translateY(-8px); filter: brightness(1.2); }
+            100% { transform: translateY(0px); filter: brightness(1); }
+        }
+        @keyframes shootComet {
+            0% { transform: translateX(0) translateY(0); opacity: 0; }
+            5% { opacity: 1; }
+            15% { transform: translateX(-25vw) translateY(12vh); opacity: 0; }
+            100% { transform: translateX(-25vw) translateY(12vh); opacity: 0; }
+        }
+        /* Main UI Central Dashboard Panel Container */
+        .hero-panel {
+            background: #11141a;
+            color: #ffffff;
+            padding: 3.5rem 3rem;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            max-width: 580px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.08);
+            z-index: 2; /* Sits over the background elements */
+        }
+
+        /* Core UI Styling Components */
+        .app-badge {
+            background: rgba(232, 93, 68, 0.2);
+            color: #ff7a63;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        h1 { font-size: 4rem; font-weight: 800; margin: 0; letter-spacing: -2px; line-height: 1; }
+        h2 { font-size: 1.3rem; font-weight: 400; margin: 0.5rem 0 2rem 0; color: #a0aec0; }
+        p { font-size: 1rem; line-height: 1.6; color: #cbd5e0; margin-bottom: 1.2rem; text-align: left; }
+        .main-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 2.5rem;
+        }
+        @media (min-width: 480px) {
+            .main-actions { grid-template-columns: 2fr 1fr 1fr; }
+        }
+        .action-link {
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 14px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .accent-btn { background: #ff7a63; color: white; }
+        .accent-btn:hover { background: #e85d44; transform: translateY(-2px); }
+        .outline-btn { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .outline-btn:hover { background: rgba(255,255,255,0.05); border-color: white; }
+        .footer-note { font-size: 0.8rem; color: #718096; margin-top: 3rem; }
+
+        /* Confetti Elements Wrapper */
+        .confetti-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; pointer-events: none;
+            z-index: 1;
+        }
+        .confetti {
+            position: absolute;
+            top: -20px; width: 12px; height: 12px;
+            opacity: 0.4;
+            border-radius: 50%;
+            animation: fall 4s infinite linear;
+        }
+        @media (max-width: 900px) {
+            /* Hides background objects on narrower windows so the screen doesn't clutter */
+            .space-object { display: none; }
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Stars field container -->
+    <div class="star-field"></div>
+
+    <!-- Active Celestial Objects Structure -->
+    <div class="space-object black-hole"></div>
+    <div class="space-object gas-giant"></div>
+    <div class="space-object mystic-moon"></div>
+    <div class="space-object comet"></div>
+    <div class="space-object spiral-galaxy"></div>
+    <div class="space-object star-cluster"></div>
+    <div class="space-object solar-star"></div>
+
+    <!-- Main Central Application Card Box -->
+    <div class="hero-panel">
+        <span class="app-badge">Trivia Platform</span>
+        <h1>Vektor</h1>
+        <h2>Join the Quiz Multiverse!</h2>
+        
+        <p>🎯 Vektor is a quiz software designed for you to enjoy playing and having fun while learning at the exact same time!</p>
+        <p>⚡ Enjoy testing yourself on various kinds of topics. Get started immediately by hitting the primary play option below.</p>
+        <p>📖 Use the secondary actions if you want to read the system tutorial or meet our creator.</p>
+        <p>🎵 Click anywhere to start the background music.</p>
+
+        <div class="main-actions">
+            <a href="play.html" class="action-link accent-btn">Play</a>
+            <a href="tutorial.html" class="action-link outline-btn">Tutorial</a>
+            <a href="aboutus.html" class="action-link outline-btn">About Us</a>
+            <a href="statistics.html" class="action-link outline-btn">Statistics</a>
+        </div>
+        <div class="footer-note">© 2026 Vektor. All rights reserved.</div>
+    </div>
+
+    <!-- Confetti elements tracker -->
+    <div class="confetti-container">
+        <div class="confetti" style="left:10%; background: #ff007f; animation-delay: 0s;"></div>
+        <div class="confetti" style="left:30%; background: #00ffff; animation-delay: 2s;"></div>
+        <div class="confetti" style="left:50%; background: #ffff00; animation-delay: 1s;"></div>
+        <div class="confetti" style="left:80%; background: #7000ff; animation-delay: 3s;"></div>
+    </div>
+
+    <!-- Hanging flag banner -->
+    <svg viewBox="0 0 100 20" style="position: absolute; top: 0; width: 100%; z-index: 3; pointer-events: none;">
+        <path d="M0,0 Q25,12 50,0 Q75,12 100,0" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.2"/>
+        <polygon points="5,2.3 15,4.3 10,12" fill="#ff007f" />
+        <polygon points="25,4.5 35,4.5 30,13" fill="#00ffff" />
+        <polygon points="65,4.5 75,4.5 70,13" fill="#ffff00" />
+        <polygon points="87,2.3 97,4.3 92,12" fill="#7000ff" />
+    </svg>
+
+    <audio id="bg-music" loop preload="auto">
+        <source src="music/home.mp3" type="audio/mpeg">
+      </audio>
+      
+      <script>
+      function startMusic() {
+          const music = document.getElementById("bg-music");
+          music.volume = 1;
+          music.play().catch(() => {});
+      }
+      
+      // start on ANY user interaction
+      document.addEventListener("click", startMusic, { once: true });
+      document.addEventListener("keydown", startMusic, { once: true });
+      </script>
+
+</body>
+</html>
