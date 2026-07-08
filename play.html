@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Arena - Vektor</title>
+    <!-- Google Fonts for an elegant, modern feel -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    
+    <style>
+
+        /* Base Setup with Multiverse Space Canvas */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #0a0f1d 0%, #03050a 100%);
+            color: #11141a;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Nebula Gas Layer */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 15% 20%, rgba(112, 0, 255, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(0, 242, 254, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 50% 10%, rgba(232, 93, 68, 0.08) 0%, transparent 40%);
+            filter: blur(50px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Dynamic Star Field Layer */
+        .star-field {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .star-field::after {
+            content: '';
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 
+                10vw 15vh 1px #fff, 25vw 35vh 2px #fff, 85vw 12vh 1px #fff,
+                5vw 65vh 2px #fff, 40vw 50vh 1px #fff, 75vw 70vh 2px #fff,
+                20vw 85vh 1px #fff, 60vw 92vh 2px #fff, 92vw 55vh 1px #fff,
+                15vw 40vh 1px #fff, 55vw 78vh 2px #fff, 80vw 35vh 1px #fff,
+                33vw 65vh 1px #fff, 68vw 18vh 2px #fff, 95vw 88vh 1px #fff;
+            animation: spaceTwinkle 4s ease-in-out infinite alternate;
+        }
+        @keyframes spaceTwinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* Celestial Background Objects */
+        .space-object {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Swirling Black Hole (Top Left) */
+        .black-hole {
+            top: 15vh;
+            left: 5vw;
+            width: 90px;
+            height: 90px;
+            background: #000;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #000, 0 0 40px #7000ff, 0 0 60px #ff007f;
+            animation: floatingGlow 6s infinite ease-in-out;
+        }
+        .black-hole::before {
+            content: '';
+            position: absolute;
+            top: -12px; left: -12px; right: -12px; bottom: -12px;
+            border: 3px double rgba(0, 242, 254, 0.4);
+            border-radius: 50%;
+            border-left-color: transparent;
+            border-right-color: transparent;
+            animation: rotateRing 8s infinite linear;
+        }
+
+        /* Ringed Gas Giant Planet (Bottom Right) */
+        .gas-giant {
+            bottom: 12vh;
+            right: 5vw;
+            width: 95px;
+            height: 95px;
+            background: linear-gradient(135deg, #ff7a63 0%, #7000ff 100%);
+            border-radius: 50%;
+            box-shadow: inset -15px -15px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255, 122, 99, 0.3);
+        }
+        .gas-giant::before {
+            content: '';
+            position: absolute;
+            top: 38px; left: -35px;
+            width: 165px;
+            height: 20px;
+            border: 6px solid rgba(255, 255, 255, 0.15);
+            border-top-color: transparent;
+            border-radius: 50%;
+            transform: rotate(-15deg);
+        }
+
+        /* Distant Dark Outpost Moon (Top Right) */
+        .mystic-moon {
+            top: 15vh;
+            right: 8vw;
+            width: 35px;
+            height: 35px;
+            background: #2d3748;
+            border-radius: 50%;
+            box-shadow: inset -8px -8px 15px rgba(0,0,0,0.9), 0 0 10px rgba(0, 242, 254, 0.15);
+        }
+
+        /* Streaking Comet (Top Center) */
+        .comet {
+            top: 6vh;
+            left: 45vw;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px 2px #fff;
+            animation: shootComet 12s infinite linear;
+            opacity: 0;
+        }
+        .comet::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 2px; width: 80px; height: 2px;
+            background: linear-gradient(to left, rgba(255,255,255,0.7), transparent);
+            transform: translateY(-50%) rotate(-25deg);
+            transform-origin: left center;
+        }
+
+        /* Spinning Spiral Galaxy (Middle Left) */
+        .spiral-galaxy {
+            top: 48vh;
+            left: 3vw;
+            width: 70px;
+            height: 30px;
+            background: radial-gradient(ellipse at center, rgba(0, 242, 254, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(2px);
+            transform: rotate(-30deg);
+            animation: rotateRing 25s infinite linear;
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.4);
+        }
+
+        /* Glowing Star Cluster (Middle Right) */
+        .star-cluster {
+            top: 50vh;
+            right: 4vw;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            box-shadow: 
+                5px 5px 2px #00ffff, -8px 12px 1px #fff, 12px -5px 3px rgba(0,242,254,0.7),
+                -3px -8px 2px #fff, 8px 15px 1px rgba(112, 0, 255, 0.6);
+            filter: blur(1px);
+            animation: floatingGlow 5s infinite ease-in-out alternate;
+        }
+
+        /* Fiery Solar Flare Star (Bottom Left) */
+        .solar-star {
+            bottom: 8vh;
+            left: 8vw;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at center, #fff 20%, #ff7a63 60%, #e85d44 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 25px #ff7a63, 0 0 45px rgba(232, 93, 68, 0.5);
+            animation: floatingGlow 7s infinite ease-in-out;
+        }
+
+        /* Core Space Animations */
+        @keyframes rotateRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes floatingGlow {
+            0% { transform: translateY(0px); filter: brightness(1); }
+            50% { transform: translateY(-8px); filter: brightness(1.2); }
+            100% { transform: translateY(0px); filter: brightness(1); }
+        }
+        @keyframes shootComet {
+            0% { transform: translateX(0) translateY(0); opacity: 0; }
+            5% { opacity: 1; }
+            15% { transform: translateX(-25vw) translateY(12vh); opacity: 0; }
+            100% { transform: translateX(-25vw) translateY(12vh); opacity: 0; }
+        }
+
+        .page-badge{
+            position:absolute;
+            top:70px;
+            left:50%;
+            transform:translateX(-50%);
+
+            background:rgba(255,122,99,.15);
+
+            color:#ff7a63;
+
+            padding:8px 20px;
+
+            border-radius:999px;
+
+            font-size:14px;
+
+            font-weight:700;
+
+            letter-spacing:1px;
+
+            text-transform:uppercase;
+
+            border:1px solid rgba(255,122,99,.25);
+
+            z-index:10;
+        }
+
+        .game-card{
+            width:min(350px,90vw);
+
+            background:
+                repeating-linear-gradient(
+                    -45deg,
+                    rgba(255,255,255,.02) 0px,
+                    rgba(255,255,255,.02) 2px,
+                    transparent 2px,
+                    transparent 16px
+                ),
+                rgba(18,31,72,.82);
+
+            backdrop-filter:blur(18px);
+
+            border:1px solid rgba(0,242,254,.25);
+
+            border-radius:30px;
+
+            padding:120px;
+
+            box-shadow:
+                0 0 25px rgba(0,242,254,.18),
+                inset 0 0 0 1px rgba(255,255,255,.03);
+
+            position:relative;
+            z-index:2;
+
+            color:white;
+
+            text-align:center;
+        }
+
+        /* Hidden Class Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Setup Specific Elements */
+        h1.main-heading {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            margin: 0 0 1.5rem 0;
+        }
+        .heading-icon { display: inline-block; margin: 0 6px; font-size: 2rem; vertical-align: middle; }
+        .input-label { font-size: 1rem; font-weight: 600; color: #a0aec0; margin-bottom: 0.8rem; display: block; }
+        
+        .name-input {
+            width: 100%;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 16px 20px;
+            border: 2px solid #cbd5e0;
+            border-radius: 14px;
+            background-color: #f7fafc;
+            outline: none;
+            transition: all 0.2s ease-in-out;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+        
+        .name-input:focus { border-color: #11141a; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(17, 20, 26, 0.1); }
+        
+        .action-container { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+        .action-container { transform: translateY(20px); }
+
+        /* Buttons Core */
+        .btn {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-start,
+        .btn-home{
+            background:linear-gradient(135deg,#49c4ff,#6a49ff);
+            color:white;
+            border:none;
+            box-shadow:0 0 18px rgba(0,242,254,.25);
+        }
+
+        .btn-start:hover,
+        .btn-home:hover{
+            transform:translateY(-3px);
+            box-shadow:0 0 30px rgba(0,242,254,.45);
+        }
+
+        .btn-play-again{
+            background:linear-gradient(135deg,#49c4ff,#6a49ff);
+            color:white;
+            box-shadow:0 0 15px rgba(37,99,235,.4);
+
+            display:block;
+            margin:30px auto;
+        }
+
+        .btn-play-again:hover{
+            background:#2563eb;
+            transform:translateY(-2px);
+        }
+
+        /* Trivia Gameplay Specific Elements */
+        .question-header {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ff7a63;
+            margin: 0 0 1rem 0;
+            font-weight: 700;
+        }
+        .question-text {
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1.4;
+            margin-bottom: 2.5rem;
+            color: white
+        }
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 1.5rem;
+        }
+        .choice-btn {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #2d3748;
+            background-color: #ffffff;
+            border: 2px solid #e2e8f0;
+            padding: 16px 20px;
+            border-radius: 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease-in-out;
+        }
+        .choice-btn:hover:not(:disabled) {
+            border-color: #11141a;
+            color: #11141a;
+            background-color: #f7fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Answer Feedback Styling States */
+        .choice-btn.correct-choice {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+            color: #155724 !important;
+        }
+        .choice-btn.incorrect-choice {
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+            color: #721c24 !important;
+        }
+
+        .feedback-message{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+
+            width: 100%;
+            margin: 1.5rem 0;
+
+            font-size: 1.2rem;
+            font-weight: 800;
+
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .feedback-icon{
+            flex: 0 0 auto;
+            font-size: 1.3rem;
+        }
+
+        .feedback-text{
+            white-space: nowrap;
+        }
+
+        .btn-next {
+            background-color: #11141a;
+            color: #ffffff;
+
+            width: 250px;
+            height: 65px;
+
+            display: block;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .btn-next:hover { background-color: #2d3748; }
+
+        /* Rank Presentation Badge Box Styling */
+        .rank-badge {
+            display: inline-block;
+            background-color: #11141a;
+            color: #ff7a63;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .quit-footer { margin-top: 2rem; }
+        .btn-quit {
+            display: inline-block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .btn-quit:hover { color: #e53e3e; }
+
+        /* MATCHED EXACTLY: Confetti element container logic from home menu */
+        .confetti-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; pointer-events: none;
+            z-index: 1; /* Renders safely behind your content panels */
+        }
+        .confetti {
+            position: absolute;
+            top: -20px; width: 12px; height: 12px;
+            opacity: 0.5;
+            border-radius: 50%;
+            animation: fall 4s infinite linear;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        @media (max-width: 900px) {
+            .space-object { display: none; }
+        }
+        /* Difficulty Selection */
+        .difficulty-label{
+            display:block;
+            font-size:1rem;
+            font-weight:700;
+            color:#a0aec0;
+            margin-top:-10px;
+            margin-bottom:12px;
+            text-align:center;
+        }
+
+        .difficulty-menu{
+            display:flex;
+            justify-content:center;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-bottom:35px;
+        }
+
+        .difficulty-btn{
+            border:none;
+            border-radius:12px;
+            padding:10px 18px;
+            font-family:'Plus Jakarta Sans', sans-serif;
+            font-size:15px;
+            font-weight:700;
+            cursor:pointer;
+            transition:0.2s;
+            color:white;
+        }
+
+        .difficulty-btn:hover{
+            transform:translateY(-2px);
+        }
+
+        .easy{
+            background:#2ecc71;
+        }
+
+        .medium{
+            background:#f1c40f;
+        }
+
+        .hard{
+            background:#e67e22;
+        }
+
+        .insane{
+            background:#dc3545;
+        }
+
+        .action-container{
+            margin-top:20px;
+            display:flex;
+            justify-content:center;
+            gap:20px;
+        }
+
+        .btn{
+            width:220px;
+            height:65px;
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            box-sizing:border-box;
+
+            text-decoration:none;
+
+            font-size:18px;
+            font-weight:700;
+
+            border-radius:18px;
+        }
+
+        .difficulty-btn.selected{
+            outline: 4px solid black;
+            transform: scale(1.08);
+        }
+
+        #streak {
+            position:absolute;
+            top:20px;
+            right:20px;
+            font-size:20px;
+            font-weight:bold;
+            color:#ff7a63;
+        }
+
+        #streak-container {
+            position:absolute;
+            top:20px;
+            right:20px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+        }
+
+        #streak {
+            font-size:20px;
+            font-weight:bold;
+            color:#ff7a63;
+        }
+
+        .streak-popup {
+            margin-top:6px;
+            font-size:16px;
+            font-weight:bold;
+            color:#ffd700;
+            opacity:0;
+            animation:streakFlash 1s forwards;
+            pointer-events:none;
+        }
+
+        @keyframes streakFlash {
+            0%{
+                opacity:0;
+                transform:translateY(8px) scale(.8);
+            }
+
+            20%{
+                opacity:1;
+                transform:translateY(0) scale(1.15);
+            }
+
+            80%{
+                opacity:1;
+            }
+
+            100%{
+                opacity:0;
+                transform:translateY(-8px) scale(1);
+            }
+            }
+
+            </style>
+
+</head>
+<body>
+
+    <div class="star-field"></div>
+
+    <!-- Background Space Matrix Elements -->
+    <div class="space-object black-hole"></div>
+    <div class="space-object gas-giant"></div>
+    <div class="space-object mystic-moon"></div>
+    <div class="space-object comet"></div>
+    <div class="space-object spiral-galaxy"></div>
+    <div class="space-object star-cluster"></div>
+    <div class="space-object solar-star"></div>
+
+    <!-- SCREEN 1: THE WELCOME NAME SETUP -->
+    <div class="game-card" id="setup-screen">
+        <div class="page-badge">
+            PLAY ARENA
+        </div>
+        <h1 class="main-heading"><span class="heading-icon">🎮</span>WELCOME TO THE TRIVIA CHALLENGE!<span class="heading-icon">🎮</span></h1>
+        <label for="player-name" class="input-label">Enter your name to begin:</label>
+        <input type="text" id="player-name" class="name-input" placeholder="Type your player name here..." autocomplete="off">
+        
+<label class="difficulty-label">Choose Your Difficulty:</label>
+
+<div class="difficulty-menu">
+    <button type="button" class="difficulty-btn easy">Easy</button>
+    <button type="button" class="difficulty-btn medium">Medium</button>
+    <button type="button" class="difficulty-btn hard">Hard</button>
+    <button type="button" class="difficulty-btn insane">Insane</button>
+</div>
+        <div class="action-container">
+            <button onclick="startGame()" class="btn btn-start">Start Game</button>
+            <a href="index.html" class="btn btn-home">Return Home</a>
+        </div>
+    </div>
+
+        <!-- SCREEN 2: THE QUESTION ARENA -->
+        <div class="game-card hidden" id="quiz-screen">
+        <div id="streak-container">
+            <div id="streak">🔥 0</div>
+        </div>
+        <div class="question-header" id="question-number">Question 1</div>
+        <div class="question-text" id="question-title">Loading Question...</div>
+        
+        <div class="choices-container" id="choices-box"></div>
+        
+        <div id="feedback-container" class="hidden">
+            <div id="feedback-text" class="feedback-message"></div>
+            <button onclick="nextQuestion()" class="btn btn-next">Next Question →</button>
+        </div>
+
+        <div class="quit-footer">
+            <a href="index.html" class="btn-quit">Quit & Return Home</a>
+        </div>
+        <div id="timer" style="
+        font-size:22px;
+        font-weight:bold;
+        margin-bottom:15px;
+        color:#2ecc71;
+        ">
+        ⏱️ Time Left: 20
+        </div>
+        </div>
+
+    <!-- MATCHED EXACTLY: Confetti div layers pouring down -->
+    <div class="confetti-container">
+        <div class="confetti" style="left:10%; background: #ff007f; animation-delay: 0s;"></div>
+        <div class="confetti" style="left:30%; background: #00ffff; animation-delay: 2s;"></div>
+        <div class="confetti" style="left:50%; background: #ffff00; animation-delay: 1s;"></div>
+        <div class="confetti" style="left:80%; background: #7000ff; animation-delay: 3s;"></div>
+    </div>
+
+    <!-- Hanging flag banner -->
+    <svg viewBox="0 0 100 20" style="position: absolute; top: 0; width: 100%; z-index: 3; pointer-events: none;">
+        <path d="M0,0 Q25,12 50,0 Q75,12 100,0" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.2"/>
+        <polygon points="5,2.3 15,4.3 10,12" fill="#ff007f" />
+        <polygon points="25,4.5 35,4.5 30,13" fill="#00ffff" />
+        <polygon points="70,4.5 80,4.5 75,13" fill="#ffff00" />
+        <polygon points="87,2.3 97,4.3 92,12" fill="#7000ff" />
+    </svg>
+
+    <script>
+
+    const easyQuestions = [
+    {question:"What planet do humans live on?",choices:["Mars","Earth","Venus","Jupiter"],correct:"Earth"},
+    {question:"How many days are in a week?",choices:["5","6","7","8"],correct:"7"},
+    {question:"What color is the sky?",choices:["Blue","Green","Red","Purple"],correct:"Blue"},
+    {question:"How many legs does a spider have?",choices:["4","6","8","10"],correct:"8"},
+    {question:"What animal says meow?",choices:["Dog","Cat","Bird","Fish"],correct:"Cat"},
+    {question:"What is 2+2?",choices:["3","4","5","6"],correct:"4"},
+    {question:"Which is a fruit?",choices:["Apple","Car","Chair","Phone"],correct:"Apple"},
+    {question:"Largest ocean?",choices:["Atlantic","Indian","Pacific","Arctic"],correct:"Pacific"},
+    {question:"Humans breathe what gas?",choices:["Oxygen","Gold","Iron","Carbon"],correct:"Oxygen"},
+    {question:"Season after spring?",choices:["Winter","Summer","Fall","None"],correct:"Summer"},
+    {question:"Months in a year?",choices:["10","11","12","13"],correct:"12"},
+    {question:"Man's best friend?",choices:["Cat","Dog","Horse","Bird"],correct:"Dog"},
+    {question:"Bees make?",choices:["Milk","Honey","Water","Bread"],correct:"Honey"},
+    {question:"Shape with 3 sides?",choices:["Square","Circle","Triangle","Star"],correct:"Triangle"},
+    {question:"Opposite of hot?",choices:["Warm","Cold","Fire","Heat"],correct:"Cold"},
+    {question:"Closest planet to Sun?",choices:["Earth","Mars","Mercury","Venus"],correct:"Mercury"},
+    {question:"Plants need?",choices:["Sunlight","Plastic","Metal","Glass"],correct:"Sunlight"},
+    {question:"Human fingers usually?",choices:["8","10","12","14"],correct:"10"},
+    {question:"Which is a bird?",choices:["Eagle","Lion","Tiger","Shark"],correct:"Eagle"},
+    {question:"Water formula?",choices:["H2O","CO2","O2","NaCl"],correct:"H2O"}
+    ];
+
+
+    const mediumQuestions = [
+    {question:"Largest continent?",choices:["Asia","Europe","Africa","America"],correct:"Asia"},
+    {question:"Chemical symbol for gold?",choices:["Au","Ag","Fe","Go"],correct:"Au"},
+    {question:"Who wrote Romeo and Juliet?",choices:["Newton","Shakespeare","Einstein","Tesla"],correct:"Shakespeare"},
+    {question:"Largest mammal?",choices:["Elephant","Blue Whale","Shark","Giraffe"],correct:"Blue Whale"},
+    {question:"Human bones?",choices:["106","206","306","406"],correct:"206"},
+    {question:"Earth revolves around?",choices:["Moon","Sun","Mars","Venus"],correct:"Sun"},
+    {question:"Hardest material?",choices:["Iron","Gold","Diamond","Steel"],correct:"Diamond"},
+    {question:"Basic unit of life?",choices:["Cell","Atom","Organ","Tissue"],correct:"Cell"},
+    {question:"Square root of 81?",choices:["7","8","9","10"],correct:"9"},
+    {question:"Red planet?",choices:["Mars","Venus","Jupiter","Saturn"],correct:"Mars"},
+    {question:"Main gas in air?",choices:["Oxygen","Nitrogen","Carbon","Hydrogen"],correct:"Nitrogen"},
+    {question:"Gravity discovered by?",choices:["Newton","Tesla","Darwin","Curie"],correct:"Newton"},
+    {question:"Planets in solar system?",choices:["7","8","9","10"],correct:"8"},
+    {question:"Largest land animal?",choices:["Lion","Elephant","Tiger","Horse"],correct:"Elephant"},
+    {question:"Boiling point water?",choices:["50C","75C","100C","200C"],correct:"100C"},
+    {question:"Capital of Japan?",choices:["Tokyo","Paris","London","Rome"],correct:"Tokyo"},
+    {question:"Human heart chambers?",choices:["2","3","4","5"],correct:"4"},
+    {question:"DNA shape?",choices:["Circle","Double Helix","Square","Line"],correct:"Double Helix"},
+    {question:"Fastest animal?",choices:["Lion","Cheetah","Horse","Wolf"],correct:"Cheetah"},
+    {question:"Largest desert?",choices:["Sahara","Gobi","Antarctic","Arabian"],correct:"Antarctic"}
+    ];
+
+
+    const hardQuestions = [
+    {question:"Which element has the atomic number 79?",choices:["Silver","Gold","Platinum","Iron"],correct:"Gold"},
+    {question:"What is the powerhouse of the cell?",choices:["Nucleus","Ribosome","Mitochondria","Membrane"],correct:"Mitochondria"},
+    {question:"Who developed the theory of relativity?",choices:["Newton","Einstein","Tesla","Darwin"],correct:"Einstein"},
+    {question:"What is the capital city of Australia?",choices:["Sydney","Melbourne","Canberra","Perth"],correct:"Canberra"},
+    {question:"Which blood type is known as the universal donor?",choices:["AB+","O-","A+","B-"],correct:"O-"},
+    {question:"What is the smallest prime number?",choices:["0","1","2","3"],correct:"2"},
+    {question:"Which layer of Earth is liquid?",choices:["Crust","Mantle","Outer Core","Inner Core"],correct:"Outer Core"},
+    {question:"What does DNA stand for?",choices:["Deoxyribonucleic Acid","Dynamic Nuclear Atom","Double Nitrogen Acid","Deoxygenated Natural Acid"],correct:"Deoxyribonucleic Acid"},
+    {question:"Which planet has the strongest winds?",choices:["Jupiter","Saturn","Neptune","Uranus"],correct:"Neptune"},
+    {question:"What is the speed of light approximately?",choices:["300,000 km/s","30,000 km/s","3,000 km/s","3 million km/s"],correct:"300,000 km/s"},
+    {question:"Which scientist discovered penicillin?",choices:["Fleming","Curie","Pasteur","Faraday"],correct:"Fleming"},
+    {question:"What is the largest organ in the human body?",choices:["Heart","Skin","Liver","Brain"],correct:"Skin"},
+    {question:"Which mathematical constant begins 3.14159?",choices:["e","Phi","Pi","Tau"],correct:"Pi"},
+    {question:"Which country has the most islands?",choices:["Indonesia","Sweden","Japan","Philippines"],correct:"Sweden"},
+    {question:"What is the chemical symbol for potassium?",choices:["P","Pt","K","Po"],correct:"K"},
+    {question:"Which part of the brain controls balance?",choices:["Cerebrum","Cerebellum","Brain Stem","Cortex"],correct:"Cerebellum"},
+    {question:"What is the longest bone in the human body?",choices:["Femur","Tibia","Spine","Radius"],correct:"Femur"},
+    {question:"Which gas do plants absorb during photosynthesis?",choices:["Oxygen","Nitrogen","Carbon Dioxide","Hydrogen"],correct:"Carbon Dioxide"},
+    {question:"What year did World War II end?",choices:["1943","1944","1945","1946"],correct:"1945"},
+    {question:"Which planet rotates on its side?",choices:["Mars","Venus","Uranus","Mercury"],correct:"Uranus"}
+    ];
+
+
+    const insaneQuestions = [
+    {question:"What is the rarest naturally occurring element on Earth?",choices:["Astatine","Gold","Uranium","Francium"],correct:"Astatine"},
+    {question:"What is the mathematical value of the golden ratio?",choices:["1.414","1.618","2.718","3.141"],correct:"1.618"},
+    {question:"Which particle carries a negative charge?",choices:["Proton","Neutron","Electron","Photon"],correct:"Electron"},
+    {question:"Who wrote 'The Republic'?",choices:["Plato","Aristotle","Socrates","Homer"],correct:"Plato"},
+    {question:"What is the deepest known point in Earth's oceans?",choices:["Mariana Trench","Tonga Trench","Java Trench","Puerto Rico Trench"],correct:"Mariana Trench"},
+    {question:"Which theorem explains right triangles?",choices:["Newton's Law","Pythagorean Theorem","Euler's Rule","Pascal's Law"],correct:"Pythagorean Theorem"},
+    {question:"What is the chemical formula of sulfuric acid?",choices:["HCl","H2SO4","NaOH","CO2"],correct:"H2SO4"},
+    {question:"Which civilization built Machu Picchu?",choices:["Maya","Roman","Inca","Aztec"],correct:"Inca"},
+    {question:"What is the hardest known natural substance?",choices:["Diamond","Graphite","Quartz","Titanium"],correct:"Diamond"},
+    {question:"Which scientist proposed natural selection?",choices:["Darwin","Newton","Galileo","Bohr"],correct:"Darwin"},
+    {question:"What is the escape velocity from Earth?",choices:["5.2 km/s","11.2 km/s","22.4 km/s","33 km/s"],correct:"11.2 km/s"},
+    {question:"Which empire used the Colosseum?",choices:["Greek","Roman","Persian","Ottoman"],correct:"Roman"},
+    {question:"What is the smallest unit of matter that keeps properties of an element?",choices:["Molecule","Atom","Cell","Proton"],correct:"Atom"},
+    {question:"Which planet has the Great Red Spot?",choices:["Mars","Jupiter","Saturn","Neptune"],correct:"Jupiter"},
+    {question:"What is the study of fungi called?",choices:["Botany","Zoology","Mycology","Ecology"],correct:"Mycology"},
+    {question:"Which number is known as Euler's number?",choices:["π","e","φ","i"],correct:"e"},
+    {question:"What is the largest known prime number category called?",choices:["Perfect prime","Mersenne prime","Mega prime","Ultra prime"],correct:"Mersenne prime"},
+    {question:"Who painted the ceiling of the Sistine Chapel?",choices:["Da Vinci","Michelangelo","Raphael","Van Gogh"],correct:"Michelangelo"},
+    {question:"Which organelle contains genetic material?",choices:["Ribosome","Nucleus","Golgi body","Lysosome"],correct:"Nucleus"},
+    {question:"What is the approximate age of Earth?",choices:["1.2 billion years","2.5 billion years","4.5 billion years","8 billion years"],correct:"4.5 billion years"}
+    ];
+
+
+        let selectedDifficulty = "";
+        let quizQuestions=[];
+        let currentQuestionIndex=0;
+        let score=0;
+        let pName="";
+        let streak = 0;
+        let highScores = {
+            easy: Number(localStorage.getItem("easyHighScore")) || 0,
+            medium: Number(localStorage.getItem("mediumHighScore")) || 0,
+            hard: Number(localStorage.getItem("hardHighScore")) || 0,
+            insane: Number(localStorage.getItem("insaneHighScore")) || 0
+        };
+        let timer;
+        let timeLeft;
+        let stats = JSON.parse(localStorage.getItem("quizStats")) || {
+            gamesPlayed: 0,
+            totalScore: 0,
+            highestScore: 0,
+            easyHighScore: 0,
+            mediumHighScore: 0,
+            hardHighScore: 0,
+            insaneHighScore: 0,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            timedOut: 0,
+            totalQuestions: 0,
+            longestStreak: 0,
+            perfectGames: 0
+            };
+
+        function saveStats(){
+            localStorage.setItem("quizStats", JSON.stringify(stats));
+        }
+            
+        const correctSound = new Audio("soundeffects/correct.mp3");
+        const wrongSound = new Audio("soundeffects/wrong.mp3");
+        const tickingSound = new Audio("soundeffects/ticking.mp3");
+        const streak3Sound = new Audio("soundeffects/streak3.mp3");
+        const streak15Sound = new Audio("soundeffects/streak15.mp3");
+        
+
+document.querySelectorAll(".difficulty-btn").forEach(button => {
+
+    button.onclick = function(){
+
+        if(this.classList.contains("selected")) {
+
+            this.classList.remove("selected");
+            selectedDifficulty = "";
+
+        } else {
+
+            document.querySelectorAll(".difficulty-btn")
+            .forEach(btn => btn.classList.remove("selected"));
+
+            this.classList.add("selected");
+
+            selectedDifficulty = this.innerText.toLowerCase();
+
+        }
+
+        console.log(selectedDifficulty);
+
+        };
+
+        });
+
+        function updateStreak(){
+        document.getElementById("streak").innerText =
+        "🔥 " + streak;
+        }
+        
+        function startGame(){
+
+        let nameBox=document.getElementById("player-name");
+
+        let nameError=document.getElementById("name-error");
+
+        let diffError=document.getElementById("difficulty-error");
+
+
+        if(!nameError){
+
+            nameError=document.createElement("p");
+            nameError.id="name-error";
+            nameBox.after(nameError);
+
+        }
+
+
+        if(!diffError){
+
+            diffError=document.createElement("p");
+            diffError.id="difficulty-error";
+            document.querySelector(".difficulty-menu").after(diffError);
+
+        }
+
+
+        nameError.style.color="#e53e3e";
+        diffError.style.color="#e53e3e";
+
+
+        nameError.innerText="";
+        diffError.innerText="";
+
+
+        let name=nameBox.value.trim();
+
+
+        let failed=false;
+
+
+        if(name===""){
+
+            nameError.innerText="Didn't enter player name!";
+            failed=true;
+
+        }
+
+
+        if(selectedDifficulty===""){
+
+            diffError.innerText="Didn't enter difficulty level!";
+            failed=true;
+
+        }
+
+        if(failed)return;
+        pName=name;
+        score = 0;
+        streak = 0;
+        document.getElementById("streak").style.display = "none";
+        updateStreak();
+
+
+        if(selectedDifficulty==="easy")
+            quizQuestions=[...easyQuestions];
+
+        if(selectedDifficulty==="medium")
+            quizQuestions=[...mediumQuestions];
+
+        if(selectedDifficulty==="hard")
+            quizQuestions=[...hardQuestions];
+
+        if(selectedDifficulty==="insane")
+            quizQuestions=[...insaneQuestions];
+
+
+        // Shuffle questions randomly
+        quizQuestions.sort(() => Math.random() - 0.5);
+
+
+        document.getElementById("setup-screen")
+        .classList.add("hidden");
+
+
+        document.getElementById("quiz-screen")
+        .classList.remove("hidden");
+
+        document.getElementById("timer").style.display = "block";
+
+        loadQuestion();
+
+        }
+        
+        function loadQuestion(){
+        
+        document.getElementById("feedback-container")
+        .classList.add("hidden");
+        
+        const nextButton = document.querySelector(".btn-next");
+
+        if (currentQuestionIndex === quizQuestions.length - 1) {
+            nextButton.innerText = "Show Results 📊";
+        } else {
+            nextButton.innerText = "Next Question →";
+        }
+
+        let q=quizQuestions[currentQuestionIndex];
+        
+        
+        document.getElementById("question-number")
+        .innerText=`Question ${currentQuestionIndex+1} of ${quizQuestions.length}`;
+        
+        
+        document.getElementById("question-title")
+        .innerText=q.question;
+        
+        
+        let box=document.getElementById("choices-box");
+        
+        box.innerHTML="";
+        
+        
+        let shuffledChoices = [...q.choices];
+
+        shuffledChoices.sort(() => Math.random() - 0.5);
+
+        shuffledChoices.forEach(choice=>{
+
+        let b=document.createElement("button");
+
+        b.className="choice-btn";
+
+        b.innerText=choice;
+
+        b.onclick=()=>checkAnswer(choice,b);
+
+        box.appendChild(b);
+        
+        });
+
+        startTimer();
+        
+        }
+
+        function startTimer(){
+
+        clearInterval(timer);
+
+        if(selectedDifficulty==="easy")
+        timeLeft=20;
+
+        if(selectedDifficulty==="medium")
+        timeLeft=15;
+
+        if(selectedDifficulty==="hard")
+        timeLeft=10;
+
+        if(selectedDifficulty==="insane")
+        timeLeft=7;
+
+        updateTimer();
+
+        timer=setInterval(function(){
+
+        timeLeft--;
+
+        updateTimer();
+
+        if (timeLeft === 5) {
+            tickingSound.currentTime = 0;
+            tickingSound.play();
+        }
+
+        if(timeLeft<=0){
+
+        clearInterval(timer);
+
+        timeOut();
+
+        }
+
+        },1000);
+
+        }
+
+        function updateTimer(){
+
+        let timerBox=document.getElementById("timer");
+
+        timerBox.innerText="⏱️ Time Left: "+timeLeft;
+
+        if(timeLeft>5){
+
+        timerBox.style.color="#2ecc71";
+
+        }
+
+        else if(timeLeft>3){
+
+        timerBox.style.color="#f39c12";
+
+        }
+
+        else{
+
+        timerBox.style.color="#e74c3c";
+
+        }
+
+        }
+
+        function timeOut(){
+
+        tickingSound.pause();
+        tickingSound.currentTime = 0;
+        stats.timedOut++;
+        stats.totalQuestions++;
+        streak = 0;
+        updateStreak();
+        saveStats();
+        document.getElementById("streak").style.display = "none";
+        updateStreak();
+
+        let q=quizQuestions[currentQuestionIndex];
+
+        document.querySelectorAll(".choice-btn").forEach(button=>{
+
+        button.disabled=true;
+
+        if(button.innerText.startsWith(q.correct)){
+
+        button.classList.add("correct-choice");
+
+        }
+
+        });
+
+        document.getElementById("feedback-container")
+        .classList.remove("hidden");
+
+        let correct=q.choices.find(choice=>choice.startsWith(q.correct));
+
+        document.getElementById("feedback-text").innerText=
+        "⏰ Time's up! The correct answer was "+correct;
+
+        }
+                        
+        function checkAnswer(answer,button){
+
+        clearInterval(timer); // Stop the timer immediately
+
+        tickingSound.pause();
+        tickingSound.currentTime = 0;
+
+        let q=quizQuestions[currentQuestionIndex];
+
+        document.querySelectorAll(".choice-btn")
+        .forEach(b=>b.disabled=true);
+
+        document.getElementById("feedback-container")
+        .classList.remove("hidden");
+
+        let text=document.getElementById("feedback-text");
+
+
+        let correctAnswerText = q.choices.find(choice =>
+            choice.startsWith(q.correct)
+        );
+
+
+        if(answer.startsWith(q.correct)){
+            
+        score++;
+        stats.correctAnswers++;
+        stats.totalQuestions++;
+        saveStats();
+        streak++;
+        if (streak > stats.longestStreak) {
+            stats.longestStreak = streak;
+        }
+        document.getElementById("streak").style.display = "block";
+        updateStreak();
+
+        if (streak === 3) {
+        streak3Sound.currentTime = 0;
+        streak3Sound.play();
+        showStreakPopup("🔥 ON FIRE!");
+        }
+        else if (streak === 5) {
+            correctSound.currentTime = 0;
+            correctSound.play();
+            showStreakPopup("⚡ UNSTOPPABLE!");
+        }
+        else if (streak === 10) {
+            correctSound.currentTime = 0;
+            correctSound.play();
+            showStreakPopup("💯 TRIVIA MASTER!");
+        }
+        else if (streak === 15) {
+            streak15Sound.currentTime = 0;
+            streak15Sound.play();
+            showStreakPopup("👑 TRIVIA GOD!");
+        }
+        else if (streak === 20) {
+            correctSound.currentTime = 0;
+            correctSound.play();
+            showStreakPopup("🎯 FULL SCORE!");
+        }
+        else {
+            correctSound.currentTime = 0;
+            correctSound.play();
+        }
+
+        button.classList.add("correct-choice");
+
+        text.innerText =
+        `✅ Correct! Great job.`;
+        }
+        else{
+
+            wrongSound.currentTime = 0;
+            wrongSound.play();
+            stats.wrongAnswers++;
+            stats.totalQuestions++;
+            streak = 0;
+            saveStats();
+            document.getElementById("streak").style.display = "none";
+            updateStreak();
+
+            button.classList.add("incorrect-choice");
+
+
+            document.querySelectorAll(".choice-btn")
+            .forEach(b=>{
+
+                if(b.innerText.startsWith(q.correct)){
+                    b.classList.add("correct-choice");
+                }
+
+            });
+
+
+            text.innerText =
+            "❌ Incorrect! The correct answer was " + correctAnswerText.substring(0) + ".";
+
+        }
+
+        }
+
+        function showStreakPopup(message){
+
+        const container = document.getElementById("streak-container");
+
+        const popup = document.createElement("div");
+
+        popup.className = "streak-popup";
+
+        popup.innerText = message;
+
+        container.appendChild(popup);
+
+        setTimeout(()=>{
+            popup.remove();
+        },1000);
+
+        }
+        
+        function nextQuestion(){
+
+        currentQuestionIndex++;
+
+        if(currentQuestionIndex < quizQuestions.length){
+
+            loadQuestion();
+
+        }
+        else{
+
+            setTimeout(() => {
+                showResults();
+            }, 1000); // wait 1 second so the FULL SCORE popup can be seen
+
+        }
+
+        }
+        
+        function showResults(){
+
+        stats.gamesPlayed++;
+
+        stats.totalScore += score;
+
+        if (score > stats.highestScore) {
+            stats.highestScore = score;
+        }
+
+        if (selectedDifficulty === "easy" && score > stats.easyHighScore) {
+            stats.easyHighScore = score;
+        }
+
+        if (selectedDifficulty === "medium" && score > stats.mediumHighScore) {
+            stats.mediumHighScore = score;
+        }
+
+        if (selectedDifficulty === "hard" && score > stats.hardHighScore) {
+            stats.hardHighScore = score;
+        }
+
+        if (selectedDifficulty === "insane" && score > stats.insaneHighScore) {
+            stats.insaneHighScore = score;
+        }
+
+        if (score === quizQuestions.length) {
+            stats.perfectGames++;
+        }
+        saveStats();
+
+        document.getElementById("timer").style.display = "none";
+
+        clearInterval(timer);
+
+        let rank;
+
+        if (score > highScores[selectedDifficulty]) {
+
+            highScores[selectedDifficulty] = score;
+
+            localStorage.setItem(
+                selectedDifficulty + "HighScore",
+                score
+            );
+
+        }
+
+        if(score>=18)rank="🌟 Legend";
+        else if(score>=14)rank="🚀 Expert";
+        else if(score>=10)rank="⭐ Skilled";
+        else rank="🛰 Beginner";
+
+
+        document.getElementById("question-number")
+        .innerText="Challenge Completed!";
+
+
+        document.getElementById("question-title")
+        .innerText=`Great game, ${pName}!`;
+
+
+        document.getElementById("choices-box")
+        .innerHTML=
+        `
+        <div class="rank-badge">
+        ${rank}<br>
+        Final Score: ${score}/20
+        <br>
+        🏆 ${selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1)} High Score: ${highScores[selectedDifficulty]}/20
+        </div>
+
+        <button onclick="playAgain()" class="btn btn-play-again">
+            Play Again
+        </button>
+        `;
+
+        document.getElementById("feedback-container")
+        .classList.add("hidden");
+
+        }
+
+        function playAgain(){
+
+        currentQuestionIndex = 0;
+        score = 0;
+
+        document.getElementById("quiz-screen")
+        .classList.add("hidden");
+
+
+        document.getElementById("setup-screen")
+        .classList.remove("hidden");
+
+
+        document.getElementById("player-name").value="";
+
+
+        selectedDifficulty="";
+
+
+        document.querySelectorAll(".difficulty-btn")
+        .forEach(btn=>{
+            btn.classList.remove("selected");
+        });
+
+        }
+        
+        </script>
+
+        <audio id="bg-music" loop preload="auto">
+            <source src="music/play.mp3" type="audio/mpeg">
+          </audio>
+
+          <audio id="button-click" preload="auto">
+            <source src="soundeffects/buttonclick.mp3" type="audio/mpeg">
+        </audio>
+          
+          <script>
+
+          function startMusic() {
+              const music = document.getElementById("bg-music");
+              music.volume = 1;
+              music.play().catch(() => {});
+          }
+        
+        // start on ANY user interaction
+        document.addEventListener("click", startMusic, { once: true });
+        document.addEventListener("keydown", startMusic, { once: true });
+        
+        const buttonClick = document.getElementById("button-click");
+        buttonClick.volume = 1;
+
+        function playButtonClick() {
+            buttonClick.currentTime = 0;
+            buttonClick.play();
+        }
+
+        // Name box
+        document.getElementById("player-name").addEventListener("click", playButtonClick);
+
+        // Difficulty buttons
+        document.querySelectorAll(".difficulty-btn").forEach(button => {
+            button.addEventListener("click", playButtonClick);
+        });
+
+        // Start Game button
+        document.querySelector(".btn-start").addEventListener("click", playButtonClick);
+
+        // Home button
+        const homeBtn = document.querySelector(".btn-home");
+        if (homeBtn) {
+            homeBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                playButtonClick();
+
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 120);
+            });
+        }
+
+        // Next Question / Show Results button
+        const nextBtn = document.querySelector(".btn-next");
+        if (nextBtn) {
+            nextBtn.addEventListener("click", playButtonClick);
+        }
+
+        // Quit & Return Home button
+        const quitBtn = document.querySelector(".btn-quit");
+        if (quitBtn) {
+            quitBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                playButtonClick();
+
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 120);
+            });
+        }
+
+        // Play Again button
+        document.addEventListener("click", function(e) {
+            if (e.target.classList.contains("btn-play-again")) {
+                playButtonClick();
+            }
+        });
+        
+        </script>
+
+</body>
+</html>
