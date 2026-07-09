@@ -328,6 +328,238 @@
 
         }
 
+        .popup{
+
+            display:none;
+
+            position:fixed;
+
+            top:0;
+            left:0;
+
+            width:100%;
+            height:100%;
+
+            background:rgba(0,0,0,.75);
+
+            justify-content:center;
+            align-items:center;
+
+            z-index:9999;
+
+            opacity:0;
+
+            transition:opacity .3s ease;
+        }
+
+        .popup.show{
+
+            display:flex;
+
+            opacity:1;
+
+        }
+
+        .popup-content{
+
+            width:700px;
+            max-width:90%;
+
+            padding:45px;
+
+            border-radius:30px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(8,16,35,.96),
+                    rgba(20,35,70,.92)
+                );
+
+            border:2px solid rgba(0,242,254,.35);
+
+            box-shadow:
+                0 0 20px rgba(0,242,254,.2),
+                0 0 50px rgba(112,0,255,.18),
+                inset 0 0 25px rgba(255,255,255,.03);
+
+            position:relative;
+
+            overflow:hidden;
+
+            text-align:center;
+
+            color:white;
+
+            transform:translateY(-40px);
+
+            opacity:0;
+
+            transition:
+                transform .35s ease,
+                opacity .35s ease;
+        }
+
+        .popup.show .popup-content{
+
+            transform:translateY(0);
+
+            opacity:1;
+
+        }
+
+        .popup-content::before{
+
+            content:"";
+
+            position:absolute;
+
+            inset:0;
+
+            background:
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent 0px,
+                    transparent 22px,
+                    rgba(0,242,254,.035) 22px,
+                    rgba(0,242,254,.035) 24px
+                );
+
+            pointer-events:none;
+        }
+
+        .close{
+
+            position:absolute;
+
+            top:18px;
+            right:25px;
+
+            width:45px;
+            height:45px;
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            border-radius:50%;
+
+            background:rgba(255,255,255,.05);
+
+            color:#ffffff;
+
+            font-size:28px;
+
+            cursor:pointer;
+
+            transition:.25s;
+        }
+
+        .popup-content hr{
+
+            border:none;
+
+            height:2px;
+
+            background:rgba(0,242,254,.2);
+
+            margin:25px 0 30px;
+
+        }
+
+        .close:hover{
+
+            background:rgba(255,255,255,.05);
+
+            transform:rotate(90deg) scale(1.1);
+
+            box-shadow:0 0 20px rgba(255,255,255,.05);
+
+        }
+
+        .quest-card{
+
+            margin-top:30px;
+            padding:25px;
+
+            border-radius:20px;
+
+            background:rgba(255,255,255,.05);
+
+            border:2px solid rgba(0,242,254,.2);
+
+            text-align:left;
+
+        }
+
+        .quest-header{
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            margin-bottom:15px;
+
+        }
+
+        .quest-title{
+
+            font-size:24px;
+
+            font-weight:700;
+
+        }
+
+        .quest-progress-text{
+
+            color:#9fdfff;
+
+            font-weight:bold;
+
+        }
+
+        .progress-bar{
+
+            height:18px;
+
+            background:rgba(255,255,255,.08);
+
+            border-radius:999px;
+
+            overflow:hidden;
+
+        }
+
+        .progress-fill{
+
+            width:0%;
+
+            height:100%;
+
+            border-radius:999px;
+
+            background:linear-gradient(
+                90deg,
+                #00f2fe,
+                #6a49ff
+            );
+
+            transition:width .4s ease;
+
+        }
+
+        .quest-reward{
+
+            margin-top:15px;
+
+            color:#ffd54a;
+
+            font-weight:bold;
+
+        }
+
         </style>
 
 </head>
@@ -360,6 +592,42 @@
         </div>
     
     </div>
+
+    <div id="questPopup" class="popup">
+
+        <div class="popup-content">
+    
+            <span id="closePopup" class="close">&times;</span>
+    
+            <div class="page-badge">
+                DAILY MISSIONS
+            </div>
+    
+            <h1>Quests</h1>
+    
+            <h2>Complete challenges and earn XP!</h2>
+    
+            <hr>
+    
+            <div class="quest-card">
+
+                <div class="quest-header">
+                    <span class="quest-title">🎮 Play 100 Games</span>
+                    <span class="quest-progress-text" id="quest1Text">0 / 100</span>
+                </div>
+            
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quest1Bar"></div>
+                </div>
+            
+                <div class="quest-reward">
+                    ⭐ Reward: 100 XP
+                </div>
+            
+            </div>
+    
+        </div>
+    
     </div>
     
         <!-- Confetti elements tracker -->
@@ -384,6 +652,10 @@
           </audio>
           
           <script>
+
+          let gamesPlayed = Number(localStorage.getItem("gamesPlayed")) || 0;
+
+          const PLAY_GAMES_GOAL = 100;
             
           function startMusic() {
               const music = document.getElementById("bg-music");
@@ -412,6 +684,65 @@
                   }, 150);
               });
           }
+
+          const popup = document.getElementById("questPopup");
+          const openButton = document.getElementById("openQuests");
+          const closeButton = document.getElementById("closePopup");
+
+          openButton.addEventListener("click", () => {
+
+              buttonClickSound.currentTime = 0;
+              buttonClickSound.play();
+
+              popup.style.display = "flex";
+
+              requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                      popup.classList.add("show");
+                  });
+              });
+
+          });
+
+          closeButton.addEventListener("click", () => {
+
+              buttonClickSound.currentTime = 0;
+              buttonClickSound.play();
+
+              popup.classList.remove("show");
+
+              setTimeout(() => {
+                  popup.style.display = "none";
+              }, 350);
+          });
+
+          window.addEventListener("click", function (event) {
+              if (event.target === popup) {
+
+                  buttonClickSound.currentTime = 0;
+                  buttonClickSound.play();
+
+                  popup.classList.remove("show");
+
+                  setTimeout(() => {
+                      popup.style.display = "none";
+                  }, 350);
+              }
+          });
+
+          function updateQuestProgress() {
+
+              gamesPlayed = Number(localStorage.getItem("gamesPlayed")) || 0;
+
+              const percent = Math.min((gamesPlayed / PLAY_GAMES_GOAL) * 100, 100);
+
+              document.getElementById("quest1Bar").style.width = percent + "%";
+
+              document.getElementById("quest1Text").textContent =
+                  gamesPlayed + " / " + PLAY_GAMES_GOAL;
+          }
+
+          updateQuestProgress();
 
           </script>
 
