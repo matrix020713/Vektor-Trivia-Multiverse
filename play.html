@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Arena - Vektor</title>
+    <!-- Google Fonts for an elegant, modern feel -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    
+    <style>
+
+        /* Base Setup with Multiverse Space Canvas */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #0a0f1d 0%, #03050a 100%);
+            color: #11141a;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Nebula Gas Layer */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 15% 20%, rgba(112, 0, 255, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(0, 242, 254, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 50% 10%, rgba(232, 93, 68, 0.08) 0%, transparent 40%);
+            filter: blur(50px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Dynamic Star Field Layer */
+        .star-field {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .star-field::after {
+            content: '';
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 
+                10vw 15vh 1px #fff, 25vw 35vh 2px #fff, 85vw 12vh 1px #fff,
+                5vw 65vh 2px #fff, 40vw 50vh 1px #fff, 75vw 70vh 2px #fff,
+                20vw 85vh 1px #fff, 60vw 92vh 2px #fff, 92vw 55vh 1px #fff,
+                15vw 40vh 1px #fff, 55vw 78vh 2px #fff, 80vw 35vh 1px #fff,
+                33vw 65vh 1px #fff, 68vw 18vh 2px #fff, 95vw 88vh 1px #fff;
+            animation: spaceTwinkle 4s ease-in-out infinite alternate;
+        }
+        @keyframes spaceTwinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* Celestial Background Objects */
+        .space-object {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Swirling Black Hole (Top Left) */
+        .black-hole {
+            top: 15vh;
+            left: 5vw;
+            width: 90px;
+            height: 90px;
+            background: #000;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #000, 0 0 40px #7000ff, 0 0 60px #ff007f;
+            animation: floatingGlow 6s infinite ease-in-out;
+        }
+        .black-hole::before {
+            content: '';
+            position: absolute;
+            top: -12px; left: -12px; right: -12px; bottom: -12px;
+            border: 3px double rgba(0, 242, 254, 0.4);
+            border-radius: 50%;
+            border-left-color: transparent;
+            border-right-color: transparent;
+            animation: rotateRing 8s infinite linear;
+        }
+
+        /* Ringed Gas Giant Planet (Bottom Right) */
+        .gas-giant {
+            bottom: 12vh;
+            right: 5vw;
+            width: 95px;
+            height: 95px;
+            background: linear-gradient(135deg, #ff7a63 0%, #7000ff 100%);
+            border-radius: 50%;
+            box-shadow: inset -15px -15px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255, 122, 99, 0.3);
+        }
+        .gas-giant::before {
+            content: '';
+            position: absolute;
+            top: 38px; left: -35px;
+            width: 165px;
+            height: 20px;
+            border: 6px solid rgba(255, 255, 255, 0.15);
+            border-top-color: transparent;
+            border-radius: 50%;
+            transform: rotate(-15deg);
+        }
+
+        /* Distant Dark Outpost Moon (Top Right) */
+        .mystic-moon {
+            top: 15vh;
+            right: 8vw;
+            width: 35px;
+            height: 35px;
+            background: #2d3748;
+            border-radius: 50%;
+            box-shadow: inset -8px -8px 15px rgba(0,0,0,0.9), 0 0 10px rgba(0, 242, 254, 0.15);
+        }
+
+        /* Streaking Comet (Top Center) */
+        .comet {
+            top: 6vh;
+            left: 45vw;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px 2px #fff;
+            animation: shootComet 12s infinite linear;
+            opacity: 0;
+        }
+        .comet::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 2px; width: 80px; height: 2px;
+            background: linear-gradient(to left, rgba(255,255,255,0.7), transparent);
+            transform: translateY(-50%) rotate(-25deg);
+            transform-origin: left center;
+        }
+
+        /* Spinning Spiral Galaxy (Middle Left) */
+        .spiral-galaxy {
+            top: 48vh;
+            left: 3vw;
+            width: 70px;
+            height: 30px;
+            background: radial-gradient(ellipse at center, rgba(0, 242, 254, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(2px);
+            transform: rotate(-30deg);
+            animation: rotateRing 25s infinite linear;
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.4);
+        }
+
+        /* Glowing Star Cluster (Middle Right) */
+        .star-cluster {
+            top: 50vh;
+            right: 4vw;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            box-shadow: 
+                5px 5px 2px #00ffff, -8px 12px 1px #fff, 12px -5px 3px rgba(0,242,254,0.7),
+                -3px -8px 2px #fff, 8px 15px 1px rgba(112, 0, 255, 0.6);
+            filter: blur(1px);
+            animation: floatingGlow 5s infinite ease-in-out alternate;
+        }
+
+        /* Fiery Solar Flare Star (Bottom Left) */
+        .solar-star {
+            bottom: 8vh;
+            left: 8vw;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at center, #fff 20%, #ff7a63 60%, #e85d44 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 25px #ff7a63, 0 0 45px rgba(232, 93, 68, 0.5);
+            animation: floatingGlow 7s infinite ease-in-out;
+        }
+
+        /* Core Space Animations */
+        @keyframes rotateRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes floatingGlow {
+            0% { transform: translateY(0px); filter: brightness(1); }
+            50% { transform: translateY(-8px); filter: brightness(1.2); }
+            100% { transform: translateY(0px); filter: brightness(1); }
+        }
+        @keyframes shootComet {
+            0% { transform: translateX(0) translateY(0); opacity: 0; }
+            5% { opacity: 1; }
+            15% { transform: translateX(-25vw) translateY(12vh); opacity: 0; }
+            100% { transform: translateX(-25vw) translateY(12vh); opacity: 0; }
+        }
+
+        .page-badge{
+            position:absolute;
+            top:70px;
+            left:50%;
+            transform:translateX(-50%);
+
+            background:rgba(255,122,99,.15);
+
+            color:#ff7a63;
+
+            padding:8px 20px;
+
+            border-radius:999px;
+
+            font-size:14px;
+
+            font-weight:700;
+
+            letter-spacing:1px;
+
+            text-transform:uppercase;
+
+            border:1px solid rgba(255,122,99,.25);
+
+            z-index:10;
+        }
+
+        .game-card{
+            width:min(350px,90vw);
+
+            background:
+                repeating-linear-gradient(
+                    -45deg,
+                    rgba(255,255,255,.02) 0px,
+                    rgba(255,255,255,.02) 2px,
+                    transparent 2px,
+                    transparent 16px
+                ),
+                rgba(18,31,72,.82);
+
+            backdrop-filter:blur(18px);
+
+            border:1px solid rgba(0,242,254,.25);
+
+            border-radius:30px;
+
+            padding:120px;
+
+            box-shadow:
+                0 0 25px rgba(0,242,254,.18),
+                inset 0 0 0 1px rgba(255,255,255,.03);
+
+            position:relative;
+            z-index:2;
+
+            color:white;
+
+            text-align:center;
+        }
+
+        /* Hidden Class Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Setup Specific Elements */
+        h1.main-heading {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            margin: 0 0 1.5rem 0;
+        }
+        .heading-icon { display: inline-block; margin: 0 6px; font-size: 2rem; vertical-align: middle; }
+        .input-label { font-size: 1rem; font-weight: 600; color: #a0aec0; margin-bottom: 0.8rem; display: block; }
+        
+        .name-input {
+            width: 100%;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 16px 20px;
+            border: 2px solid #cbd5e0;
+            border-radius: 14px;
+            background-color: #f7fafc;
+            outline: none;
+            transition: all 0.2s ease-in-out;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+        
+        .name-input:focus { border-color: #11141a; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(17, 20, 26, 0.1); }
+        
+        .action-container { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+        .action-container { transform: translateY(20px); }
+
+        /* Buttons Core */
+        .btn {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-start,
+        .btn-home{
+            background:linear-gradient(135deg,#49c4ff,#6a49ff);
+            color:white;
+            border:none;
+            box-shadow:0 0 18px rgba(0,242,254,.25);
+        }
+
+        .btn-start:hover,
+        .btn-home:hover{
+            transform:translateY(-3px);
+            box-shadow:0 0 30px rgba(0,242,254,.45);
+        }
+
+        .btn-play-again{
+            background:linear-gradient(135deg,#49c4ff,#6a49ff);
+            color:white;
+            box-shadow:0 0 15px rgba(37,99,235,.4);
+
+            display:block;
+            margin:30px auto;
+        }
+
+        .btn-play-again:hover{
+            background:#2563eb;
+            transform:translateY(-2px);
+        }
+
+        /* Trivia Gameplay Specific Elements */
+        .question-header {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ff7a63;
+            margin: 0 0 1rem 0;
+            font-weight: 700;
+        }
+        .question-text {
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1.4;
+            margin-bottom: 2.5rem;
+            color: white
+        }
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 1.5rem;
+        }
+        .choice-btn {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #2d3748;
+            background-color: #ffffff;
+            border: 2px solid #e2e8f0;
+            padding: 16px 20px;
+            border-radius: 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease-in-out;
+        }
+        .choice-btn:hover:not(:disabled) {
+            border-color: #11141a;
+            color: #11141a;
+            background-color: #f7fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Answer Feedback Styling States */
+        .choice-btn.correct-choice {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+            color: #155724 !important;
+        }
+        .choice-btn.incorrect-choice {
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+            color: #721c24 !important;
+        }
+
+        .feedback-message{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+
+            width: 100%;
+            margin: 1.5rem 0;
+
+            font-size: 1.2rem;
+            font-weight: 800;
+
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .feedback-icon{
+            flex: 0 0 auto;
+            font-size: 1.3rem;
+        }
+
+        .feedback-text{
+            white-space: nowrap;
+        }
+
+        .btn-next {
+            background-color: #11141a;
+            color: #ffffff;
+
+            width: 250px;
+            height: 65px;
+
+            display: block;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .btn-next:hover { background-color: #2d3748; }
+
+        /* Rank Presentation Badge Box Styling */
+        .rank-badge {
+            display: inline-block;
+            background-color: #11141a;
+            color: #ff7a63;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .quit-footer { margin-top: 2rem; }
+        .btn-quit {
+            display: inline-block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .btn-quit:hover { color: #e53e3e; }
+
+        /* MATCHED EXACTLY: Confetti element container logic from home menu */
+        .confetti-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; pointer-events: none;
+            z-index: 1; /* Renders safely behind your content panels */
+        }
+        .confetti {
+            position: absolute;
+            top: -20px; width: 12px; height: 12px;
+            opacity: 0.5;
+            border-radius: 50%;
+            animation: fall 4s infinite linear;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        @media (max-width: 900px) {
+            .space-object { display: none; }
+        }
+        /* Difficulty Selection */
+        .difficulty-label{
+            display:block;
+            font-size:1rem;
+            font-weight:700;
+            color:#a0aec0;
+            margin-top:-10px;
+            margin-bottom:12px;
+            text-align:center;
+        }
+
+        .difficulty-menu{
+            display:flex;
+            justify-content:center;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-bottom:35px;
+        }
+
+        .difficulty-btn{
+            border:none;
+            border-radius:12px;
+            padding:10px 18px;
+            font-family:'Plus Jakarta Sans', sans-serif;
+            font-size:15px;
+            font-weight:700;
+            cursor:pointer;
+            transition:0.2s;
+            color:white;
+        }
+
+        .difficulty-btn:hover{
+            transform:translateY(-2px);
+        }
+
+        .easy{
+            background:#2ecc71;
+        }
+
+        .medium{
+            background:#f1c40f;
+        }
+
+        .hard{
+            background:#e67e22;
+        }
+
+        .insane{
+            background:#dc3545;
+        }
+
+        .action-container{
+            margin-top:20px;
+            display:flex;
+            justify-content:center;
+            gap:20px;
+        }
+
+        .btn{
+            width:220px;
+            height:65px;
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            box-sizing:border-box;
+
+            text-decoration:none;
+
+            font-size:18px;
+            font-weight:700;
+
+            border-radius:18px;
+        }
+
+        .difficulty-btn.selected{
+            outline: 4px solid black;
+            transform: scale(1.08);
+        }
+
+        #streak {
+            position:absolute;
+            top:20px;
+            right:20px;
+            font-size:20px;
+            font-weight:bold;
+            color:#ff7a63;
+        }
+
+        #streak-container {
+            position:absolute;
+            top:20px;
+            right:20px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+        }
+
+        #streak {
+            font-size:20px;
+            font-weight:bold;
+            color:#ff7a63;
+        }
+
+        .streak-popup {
+            margin-top:6px;
+            font-size:16px;
+            font-weight:bold;
+            color:#ffd700;
+            opacity:0;
+            animation:streakFlash 1s forwards;
+            pointer-events:none;
+        }
+
+        @keyframes streakFlash {
+            0%{
+                opacity:0;
+                transform:translateY(8px) scale(.8);
+            }
+
+            20%{
+                opacity:1;
+                transform:translateY(0) scale(1.15);
+            }
+
+            80%{
+                opacity:1;
+            }
+
+            100%{
+                opacity:0;
+                transform:translateY(-8px) scale(1);
+            }
+            }
+
+            </style>
+
+</head>
+<body>
+
+    <div class="star-field"></div>
+
+    <!-- Background Space Matrix Elements -->
+    <div class="space-object black-hole"></div>
+    <div class="space-object gas-giant"></div>
+    <div class="space-object mystic-moon"></div>
+    <div class="space-object comet"></div>
+    <div class="space-object spiral-galaxy"></div>
+    <div class="space-object star-cluster"></div>
+    <div class="space-object solar-star"></div>
+
+    <!-- SCREEN 1: THE WELCOME NAME SETUP -->
+    <div class="game-card" id="setup-screen">
+        <div class="page-badge">
+            PLAY ARENA
+        </div>
+        <h1 class="main-heading"><span class="heading-icon">🎮</span>WELCOME TO THE TRIVIA CHALLENGE!<span class="heading-icon">🎮</span></h1>
+        <label for="player-name" class="input-label">Enter your name to begin:</label>
+        <input type="text" id="player-name" class="name-input" placeholder="Type your player name here..." autocomplete="off">
+        
+        <label class="difficulty-label">Choose Your Difficulty:</label>
+
+        <div class="difficulty-menu">
+            <button type="button" class="difficulty-btn easy">Easy</button>
+            <button type="button" class="difficulty-btn medium">Medium</button>
+            <button type="button" class="difficulty-btn hard">Hard</button>
+            <button type="button" class="difficulty-btn insane">Insane</button>
+        </div>
+
+        <div class="action-container">
+            <button onclick="startGame()" class="btn btn-start">Start Game</button>
+            <a href="index.html" class="btn btn-home">Return Home</a>
+        </div>
+    </div>
+
+        <!-- SCREEN 2: THE QUESTION ARENA -->
+        <div class="game-card hidden" id="quiz-screen">
+        <div id="streak-container">
+            <div id="streak">🔥 0</div>
+        </div>
+        <div class="question-header" id="question-number">Question 1</div>
+        <div class="question-text" id="question-title">Loading Question...</div>
+        
+        <div class="choices-container" id="choices-box"></div>
+        
+        <div id="feedback-container" class="hidden">
+            <div id="feedback-text" class="feedback-message"></div>
+            <button onclick="nextQuestion()" class="btn btn-next">Next Question →</button>
+        </div>
+
+        <div class="quit-footer">
+            <a href="index.html" class="btn-quit">Quit & Return Home</a>
+        </div>
+        <div id="timer" style="
+        font-size:22px;
+        font-weight:bold;
+        margin-bottom:15px;
+        color:#2ecc71;
+        ">
+        ⏱️ Time Left: 20
+        </div>
+        </div>
+
+    <!-- MATCHED EXACTLY: Confetti div layers pouring down -->
+    <div class="confetti-container">
+        <div class="confetti" style="left:10%; background: #ff007f; animation-delay: 0s;"></div>
+        <div class="confetti" style="left:30%; background: #00ffff; animation-delay: 2s;"></div>
+        <div class="confetti" style="left:50%; background: #ffff00; animation-delay: 1s;"></div>
+        <div class="confetti" style="left:80%; background: #7000ff; animation-delay: 3s;"></div>
+    </div>
+
+    <!-- Hanging flag banner -->
+    <svg viewBox="0 0 100 20" style="position: absolute; top: 0; width: 100%; z-index: 3; pointer-events: none;">
+        <path d="M0,0 Q25,12 50,0 Q75,12 100,0" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.2"/>
+        <polygon points="5,2.3 15,4.3 10,12" fill="#ff007f" />
+        <polygon points="25,4.5 35,4.5 30,13" fill="#00ffff" />
+        <polygon points="70,4.5 80,4.5 75,13" fill="#ffff00" />
+        <polygon points="87,2.3 97,4.3 92,12" fill="#7000ff" />
+    </svg>
+
+    <script>
+
+    let gameCounted = false;
+
+    let playerXP = Number(localStorage.getItem("playerXP")) || 0;
+
+    function earnXP(amount){
+
+        console.trace("earnXP called with", amount);
+
+        playerXP += amount;
+
+        console.log("playerXP is now", playerXP);
+
+        localStorage.setItem("playerXP", playerXP);
+
+        let pendingXP =
+            Number(localStorage.getItem("pendingXP")) || 0;
+
+        pendingXP += amount;
+
+        localStorage.setItem("pendingXP", pendingXP);
+
+    }
+
+    const easyQuestions = [
+    {question:"What is the largest planet in our solar system?",choices:["Earth","Mars","Jupiter","Saturn"],correct:"Jupiter"},
+    {question:"How many hours are in one day?",choices:["12","18","24","36"],correct:"24"},
+    {question:"Which animal is known as the King of the Jungle?",choices:["Tiger","Elephant","Lion","Bear"],correct:"Lion"},
+    {question:"What do cows drink?",choices:["Milk","Water","Juice","Tea"],correct:"Water"},
+    {question:"What is frozen water called?",choices:["Steam","Ice","Rain","Snow"],correct:"Ice"},
+    {question:"Which shape has four equal sides?",choices:["Triangle","Circle","Square","Oval"],correct:"Square"},
+    {question:"Which planet is known as the Red Planet?",choices:["Mars","Venus","Mercury","Earth"],correct:"Mars"},
+    {question:"How many continents are there?",choices:["5","6","7","8"],correct:"7"},
+    {question:"What is the tallest animal?",choices:["Elephant","Giraffe","Horse","Camel"],correct:"Giraffe"},
+    {question:"Which animal barks?",choices:["Cat","Dog","Cow","Horse"],correct:"Dog"},
+    {question:"How many wheels does a bicycle have?",choices:["1","2","3","4"],correct:"2"},
+    {question:"What is 10 minus 4?",choices:["4","5","6","7"],correct:"6"},
+    {question:"Which bird cannot fly?",choices:["Eagle","Penguin","Parrot","Crow"],correct:"Penguin"},
+    {question:"What is the capital of France?",choices:["Paris","Rome","Berlin","Madrid"],correct:"Paris"},
+    {question:"Which season comes after summer?",choices:["Winter","Spring","Fall","Rainy"],correct:"Fall"},
+    {question:"Which star is closest to Earth?",choices:["Polaris","The Sun","Sirius","Betelgeuse"],correct:"The Sun"},
+    {question:"What is the opposite of day?",choices:["Morning","Night","Evening","Sunset"],correct:"Night"},
+    {question:"Which animal has a trunk?",choices:["Rhino","Elephant","Hippo","Buffalo"],correct:"Elephant"},
+    {question:"What is 5 × 5?",choices:["20","25","30","35"],correct:"25"},
+    {question:"Which is a primary color?",choices:["Purple","Green","Blue","Pink"],correct:"Blue"},
+    {question:"How many letters are in the English alphabet?",choices:["24","25","26","27"],correct:"26"},
+    {question:"Which fruit is yellow?",choices:["Apple","Banana","Cherry","Grape"],correct:"Banana"},
+    {question:"What do fish breathe through?",choices:["Lungs","Skin","Gills","Nose"],correct:"Gills"},
+    {question:"Which holiday comes on December 25?",choices:["Halloween","Christmas","Easter","Thanksgiving"],correct:"Christmas"},
+    {question:"How many sides does a pentagon have?",choices:["4","5","6","7"],correct:"5"},
+    {question:"Which animal is black and white and eats bamboo?",choices:["Tiger","Panda","Zebra","Koala"],correct:"Panda"},
+    {question:"Which instrument has black and white keys?",choices:["Drum","Piano","Flute","Violin"],correct:"Piano"},
+    {question:"Which month comes after June?",choices:["May","July","August","September"],correct:"July"},
+    {question:"How many eyes does a normal spider have?",choices:["4","6","8","10"],correct:"8"},
+    {question:"What is 100 divided by 10?",choices:["5","10","20","25"],correct:"10"},
+    {question:"Which ocean is the largest?",choices:["Indian","Atlantic","Pacific","Arctic"],correct:"Pacific"},
+    {question:"Which animal can hop and carries its baby in a pouch?",choices:["Rabbit","Kangaroo","Goat","Horse"],correct:"Kangaroo"},
+    {question:"Which planet do humans live on?",choices:["Mars","Earth","Venus","Mercury"],correct:"Earth"},
+    {question:"What color are emeralds?",choices:["Blue","Green","Red","Yellow"],correct:"Green"},
+    {question:"How many minutes are in one hour?",choices:["30","45","60","90"],correct:"60"},
+    {question:"Which is the fastest land animal?",choices:["Lion","Horse","Cheetah","Wolf"],correct:"Cheetah"},
+    {question:"What is 12 + 8?",choices:["18","19","20","21"],correct:"20"},
+    {question:"Which body part helps you hear?",choices:["Eye","Ear","Nose","Hand"],correct:"Ear"},
+    {question:"Which gas do humans breathe in?",choices:["Carbon Dioxide","Hydrogen","Oxygen","Helium"],correct:"Oxygen"},
+    {question:"Which month has the fewest days?",choices:["February","April","June","September"],correct:"February"},
+    {question:"Which planet has rings that are easy to see?",choices:["Earth","Mars","Saturn","Mercury"],correct:"Saturn"},
+    {question:"What is the capital of Italy?",choices:["Rome","Paris","Athens","Lisbon"],correct:"Rome"},
+    {question:"Which animal gives us wool?",choices:["Cow","Sheep","Pig","Goat"],correct:"Sheep"},
+    {question:"How many fingers are on two hands?",choices:["8","9","10","12"],correct:"10"},
+    {question:"Which shape has no corners?",choices:["Square","Triangle","Circle","Rectangle"],correct:"Circle"},
+    {question:"What is 9 + 6?",choices:["14","15","16","17"],correct:"15"},
+    {question:"Which planet is closest to the Sun?",choices:["Mercury","Venus","Earth","Mars"],correct:"Mercury"},
+    {question:"Which is the biggest cat?",choices:["Tiger","Lion","Leopard","Cheetah"],correct:"Tiger"},
+    {question:"What is the boiling point of water at sea level?",choices:["50°C","75°C","100°C","125°C"],correct:"100°C"},
+    {question:"Which direction does the Sun rise?",choices:["North","South","East","West"],correct:"East"},
+    {question:"How many months are in a year?",choices:["10","11","12","13"],correct:"12"},
+    {question:"Which sport uses a bat and ball?",choices:["Football","Cricket","Swimming","Tennis"],correct:"Cricket"},
+    {question:"Which animal is famous for having black stripes?",choices:["Tiger","Zebra","Lion","Leopard"],correct:"Zebra"},
+    {question:"What is the first month of the year?",choices:["January","March","April","December"],correct:"January"},
+    {question:"Which is a vegetable?",choices:["Potato","Apple","Orange","Banana"],correct:"Potato"},
+    {question:"Which metal is attracted to magnets?",choices:["Gold","Iron","Silver","Copper"],correct:"Iron"},
+    {question:"What is 50 + 25?",choices:["70","75","80","85"],correct:"75"},
+    {question:"What color are ripe strawberries?",choices:["Blue","Yellow","Red","Green"],correct:"Red"},
+    {question:"Which country is famous for pizza?",choices:["France","Italy","Brazil","Canada"],correct:"Italy"},
+    {question:"How many days are there in a leap year?",choices:["364","365","366","367"],correct:"366"},
+    {question:"Which bird is a symbol of peace?",choices:["Crow","Dove","Owl","Eagle"],correct:"Dove"},
+    {question:"What is the capital of the United Kingdom?",choices:["London","Dublin","Edinburgh","Cardiff"],correct:"London"},
+    {question:"Which animal can change its color to blend in?",choices:["Lion","Chameleon","Rabbit","Wolf"],correct:"Chameleon"},
+    {question:"What is 7 × 8?",choices:["54","56","58","60"],correct:"56"},
+    {question:"Which body part pumps blood?",choices:["Brain","Liver","Heart","Lungs"],correct:"Heart"},
+    {question:"Which is the smallest planet?",choices:["Mars","Mercury","Venus","Earth"],correct:"Mercury"},
+    {question:"How many seconds are in one minute?",choices:["30","45","60","90"],correct:"60"},
+    {question:"Which animal is the largest mammal?",choices:["Elephant","Blue Whale","Hippo","Shark"],correct:"Blue Whale"},
+    {question:"Which country is shaped like a boot?",choices:["Spain","Italy","Portugal","Greece"],correct:"Italy"},
+    {question:"What is 81 divided by 9?",choices:["7","8","9","10"],correct:"9"},
+    {question:"Which is the hottest planet?",choices:["Mercury","Mars","Venus","Earth"],correct:"Venus"},
+    {question:"What do bees make?",choices:["Milk","Honey","Jam","Butter"],correct:"Honey"},
+    {question:"Which animal has a hump?",choices:["Horse","Camel","Donkey","Cow"],correct:"Camel"},
+    {question:"How many colors are in a rainbow?",choices:["5","6","7","8"],correct:"7"},
+    {question:"Which is the longest river in the world?",choices:["Amazon","Nile","Yangtze","Mississippi"],correct:"Nile"},
+    {question:"What is 14 + 9?",choices:["21","22","23","24"],correct:"23"},
+    {question:"Which planet is known for supporting life?",choices:["Venus","Earth","Mars","Saturn"],correct:"Earth"},
+    {question:"Which sport is played at Wimbledon?",choices:["Golf","Cricket","Tennis","Rugby"],correct:"Tennis"},
+    {question:"What is the hardest natural substance?",choices:["Gold","Diamond","Iron","Steel"],correct:"Diamond"},
+    {question:"Which ocean is between Africa and Australia?",choices:["Pacific","Atlantic","Indian","Arctic"],correct:"Indian"},
+    {question:"What is 15 × 2?",choices:["25","30","35","40"],correct:"30"},
+    {question:"Which country has the Great Pyramid of Giza?",choices:["Mexico","Egypt","India","Peru"],correct:"Egypt"},
+    {question:"Which instrument is used to tell time?",choices:["Compass","Clock","Thermometer","Scale"],correct:"Clock"},
+    {question:"How many legs does an insect have?",choices:["4","6","8","10"],correct:"6"},
+    {question:"Which is the biggest ocean animal?",choices:["Shark","Blue Whale","Octopus","Dolphin"],correct:"Blue Whale"},
+    {question:"What is the capital of Canada?",choices:["Toronto","Ottawa","Vancouver","Montreal"],correct:"Ottawa"},
+    {question:"Which planet is called Earth's twin?",choices:["Mars","Venus","Jupiter","Saturn"],correct:"Venus"},
+    {question:"What color are sapphires traditionally?",choices:["Blue","Red","Green","Yellow"],correct:"Blue"},
+    {question:"Which animal is known for laughing like a human?",choices:["Hyena","Fox","Wolf","Bear"],correct:"Hyena"},
+    {question:"What is 18 - 7?",choices:["10","11","12","13"],correct:"11"},
+    {question:"Which continent is Egypt in?",choices:["Asia","Europe","Africa","Australia"],correct:"Africa"},
+    {question:"What is the largest bone in the human body?",choices:["Skull","Femur","Rib","Tibia"],correct:"Femur"},
+    {question:"Which country is famous for the Eiffel Tower?",choices:["Germany","France","Italy","Spain"],correct:"France"},
+    {question:"How many planets are in the Solar System?",choices:["7","8","9","10"],correct:"8"},
+    {question:"What is 11 × 11?",choices:["111","121","131","141"],correct:"121"},
+    {question:"Which is the smallest continent?",choices:["Europe","Australia","South America","Antarctica"],correct:"Australia"},
+    {question:"Which gas do plants release during photosynthesis?",choices:["Nitrogen","Oxygen","Carbon Dioxide","Hydrogen"],correct:"Oxygen"},
+    {question:"Which famous ship hit an iceberg in 1912?",choices:["Britannic","Titanic","Queen Mary","Lusitania"],correct:"Titanic"},
+    {question:"Which animal is the tallest bird?",choices:["Eagle","Ostrich","Penguin","Flamingo"],correct:"Ostrich"},
+    {question:"What is 20 + 30?",choices:["40","45","50","55"],correct:"50"}
+    ];
+
+    const mediumQuestions = [
+    {question:"Which country has the largest population?",choices:["India","China","United States","Indonesia"],correct:"India"},
+    {question:"What is the chemical symbol for silver?",choices:["Si","Ag","Au","Sr"],correct:"Ag"},
+    {question:"Who painted the Mona Lisa?",choices:["Van Gogh","Leonardo da Vinci","Picasso","Michelangelo"],correct:"Leonardo da Vinci"},
+    {question:"What is the largest organ inside the human body?",choices:["Heart","Liver","Lungs","Skin"],correct:"Liver"},
+    {question:"Which planet is the largest?",choices:["Saturn","Earth","Jupiter","Neptune"],correct:"Jupiter"},
+    {question:"What is 15 × 8?",choices:["100","110","120","130"],correct:"120"},
+    {question:"Which gas is most abundant in Earth's atmosphere?",choices:["Oxygen","Nitrogen","Carbon Dioxide","Argon"],correct:"Nitrogen"},
+    {question:"Who invented the telephone?",choices:["Thomas Edison","Alexander Graham Bell","Nikola Tesla","James Watt"],correct:"Alexander Graham Bell"},
+    {question:"What is the capital of Brazil?",choices:["Rio de Janeiro","São Paulo","Brasília","Salvador"],correct:"Brasília"},
+    {question:"Which ocean is the second largest?",choices:["Atlantic","Indian","Pacific","Arctic"],correct:"Atlantic"},
+    {question:"How many players are on a soccer team on the field?",choices:["9","10","11","12"],correct:"11"},
+    {question:"What is the square root of 144?",choices:["10","11","12","13"],correct:"12"},
+    {question:"Which is the smallest continent?",choices:["Europe","Australia","Antarctica","South America"],correct:"Australia"},
+    {question:"Which blood type is called the universal recipient?",choices:["O-","AB+","A+","B+"],correct:"AB+"},
+    {question:"Which instrument measures temperature?",choices:["Barometer","Thermometer","Hygrometer","Compass"],correct:"Thermometer"},
+    {question:"Who wrote 'Harry Potter'?",choices:["J.R.R. Tolkien","J.K. Rowling","C.S. Lewis","Roald Dahl"],correct:"J.K. Rowling"},
+    {question:"Which country gifted the Statue of Liberty to the USA?",choices:["England","France","Canada","Spain"],correct:"France"},
+    {question:"Which is the largest species of shark?",choices:["Great White","Hammerhead","Whale Shark","Tiger Shark"],correct:"Whale Shark"},
+    {question:"What is the currency of Japan?",choices:["Won","Yen","Yuan","Ringgit"],correct:"Yen"},
+    {question:"How many teeth does an average adult have?",choices:["28","30","32","34"],correct:"32"},
+    {question:"Which scientist proposed the three laws of motion?",choices:["Einstein","Newton","Galileo","Kepler"],correct:"Newton"},
+    {question:"What is the capital of South Korea?",choices:["Busan","Seoul","Incheon","Daegu"],correct:"Seoul"},
+    {question:"Which is the largest volcano on Earth?",choices:["Mount Fuji","Mauna Loa","Mount Etna","Mount St. Helens"],correct:"Mauna Loa"},
+    {question:"What is 17 × 6?",choices:["92","96","102","108"],correct:"102"},
+    {question:"Which planet has the most moons?",choices:["Jupiter","Mars","Saturn","Neptune"],correct:"Saturn"},
+    {question:"Which language has the most native speakers?",choices:["English","Hindi","Spanish","Mandarin Chinese"],correct:"Mandarin Chinese"},
+    {question:"Which country is home to the Great Barrier Reef?",choices:["Australia","New Zealand","South Africa","Brazil"],correct:"Australia"},
+    {question:"What is the fastest bird?",choices:["Eagle","Peregrine Falcon","Ostrich","Falcon"],correct:"Peregrine Falcon"},
+    {question:"Who discovered gravity after observing a falling apple?",choices:["Galileo","Newton","Einstein","Copernicus"],correct:"Newton"},
+    {question:"Which metal is liquid at room temperature?",choices:["Mercury","Iron","Silver","Gold"],correct:"Mercury"},
+    {question:"What is the capital of Argentina?",choices:["Lima","Buenos Aires","Santiago","Montevideo"],correct:"Buenos Aires"},
+    {question:"Which planet is famous for the Great Red Spot?",choices:["Mars","Jupiter","Saturn","Neptune"],correct:"Jupiter"},
+    {question:"How many cards are in a standard deck?",choices:["48","50","52","54"],correct:"52"},
+    {question:"Which country invented paper?",choices:["India","China","Egypt","Greece"],correct:"China"},
+    {question:"What is the largest moon of Saturn?",choices:["Europa","Titan","Io","Ganymede"],correct:"Titan"},
+    {question:"What is the tallest mountain above sea level?",choices:["K2","Mount Everest","Kangchenjunga","Makalu"],correct:"Mount Everest"},
+    {question:"Which animal has the strongest bite force?",choices:["Lion","Saltwater Crocodile","Tiger","Hippo"],correct:"Saltwater Crocodile"},
+    {question:"What is 13²?",choices:["159","169","179","189"],correct:"169"},
+    {question:"Which country has the maple leaf on its flag?",choices:["Canada","Austria","Switzerland","Denmark"],correct:"Canada"},
+    {question:"Which organ produces insulin?",choices:["Liver","Pancreas","Kidney","Heart"],correct:"Pancreas"},
+    {question:"Who was the first person to walk on the Moon?",choices:["Buzz Aldrin","Neil Armstrong","Yuri Gagarin","Michael Collins"],correct:"Neil Armstrong"},
+    {question:"Which is the smallest ocean?",choices:["Atlantic","Indian","Arctic","Southern"],correct:"Arctic"},
+    {question:"What is the capital of Turkey?",choices:["Istanbul","Ankara","Izmir","Antalya"],correct:"Ankara"},
+    {question:"Which element has the chemical symbol Na?",choices:["Nickel","Nitrogen","Sodium","Neon"],correct:"Sodium"},
+    {question:"Which planet has the shortest day?",choices:["Earth","Jupiter","Mars","Mercury"],correct:"Jupiter"},
+    {question:"What is the freezing point of water in Celsius?",choices:["-10°C","0°C","10°C","32°C"],correct:"0°C"},
+    {question:"Which country is known as the Land of the Rising Sun?",choices:["China","Japan","Thailand","South Korea"],correct:"Japan"},
+    {question:"Which famous scientist developed the periodic table?",choices:["Bohr","Mendeleev","Dalton","Faraday"],correct:"Mendeleev"},
+    {question:"How many strings does a standard violin have?",choices:["4","5","6","8"],correct:"4"},
+    {question:"Which is the largest rainforest in the world?",choices:["Congo","Amazon","Daintree","Sundarbans"],correct:"Amazon"},
+    {question:"Which country is famous for the pyramids?",choices:["Mexico","Egypt","Peru","India"],correct:"Egypt"},
+    {question:"What is the largest species of penguin?",choices:["King Penguin","Emperor Penguin","Rockhopper Penguin","Adelie Penguin"],correct:"Emperor Penguin"},
+    {question:"Which vitamin is mainly produced when skin is exposed to sunlight?",choices:["Vitamin A","Vitamin B12","Vitamin C","Vitamin D"],correct:"Vitamin D"},
+    {question:"Who wrote 'The Adventures of Tom Sawyer'?",choices:["Charles Dickens","Mark Twain","Jules Verne","Ernest Hemingway"],correct:"Mark Twain"},
+    {question:"Which planet is nicknamed the Morning Star?",choices:["Mercury","Venus","Mars","Saturn"],correct:"Venus"},
+    {question:"What is 25 × 12?",choices:["250","275","300","325"],correct:"300"},
+    {question:"Which country has the most time zones?",choices:["Russia","France","United States","Australia"],correct:"France"},
+    {question:"What is the largest island in the world?",choices:["Greenland","Madagascar","Borneo","New Guinea"],correct:"Greenland"},
+    {question:"Which bone protects the brain?",choices:["Femur","Rib","Skull","Pelvis"],correct:"Skull"},
+    {question:"What is the capital of New Zealand?",choices:["Auckland","Christchurch","Wellington","Hamilton"],correct:"Wellington"},
+    {question:"Which animal is the fastest in the ocean?",choices:["Blue Whale","Sailfish","Dolphin","Shark"],correct:"Sailfish"},
+    {question:"What is the cube root of 64?",choices:["2","3","4","5"],correct:"4"},
+    {question:"Who invented the light bulb?",choices:["Thomas Edison","Nikola Tesla","Benjamin Franklin","Galileo"],correct:"Thomas Edison"},
+    {question:"Which country is home to Mount Kilimanjaro?",choices:["Kenya","Tanzania","Uganda","South Africa"],correct:"Tanzania"},
+    {question:"What is the main ingredient in guacamole?",choices:["Tomato","Avocado","Cucumber","Pepper"],correct:"Avocado"},
+    {question:"Which organ filters blood to produce urine?",choices:["Lungs","Heart","Kidneys","Pancreas"],correct:"Kidneys"},
+    {question:"Which is the longest mountain range in the world?",choices:["Rocky Mountains","Andes","Himalayas","Alps"],correct:"Andes"},
+    {question:"What is the chemical symbol for helium?",choices:["H","He","Hg","Ho"],correct:"He"},
+    {question:"Which country has the largest land area?",choices:["Canada","China","Russia","United States"],correct:"Russia"},
+    {question:"How many degrees are in a full circle?",choices:["180","270","360","720"],correct:"360"},
+    {question:"Which famous ship was commanded by Captain Jack Sparrow?",choices:["Flying Dutchman","Black Pearl","Queen Anne's Revenge","Interceptor"],correct:"Black Pearl"},
+    {question:"What is the world's longest river by volume of water?",choices:["Nile","Amazon","Yangtze","Mississippi"],correct:"Amazon"},
+    {question:"Which country is known for the Taj Mahal?",choices:["Pakistan","India","Nepal","Bangladesh"],correct:"India"},
+    {question:"Which organ helps humans breathe?",choices:["Heart","Liver","Lungs","Kidneys"],correct:"Lungs"},
+    {question:"What is the largest species of bear?",choices:["Grizzly Bear","Polar Bear","Black Bear","Panda"],correct:"Polar Bear"},
+    {question:"Who was the first President of the United States?",choices:["Abraham Lincoln","George Washington","John Adams","Thomas Jefferson"],correct:"George Washington"},
+    {question:"Which planet has the most powerful storms?",choices:["Earth","Jupiter","Neptune","Saturn"],correct:"Neptune"},
+    {question:"What is 18 × 7?",choices:["116","124","126","128"],correct:"126"},
+    {question:"Which desert is the largest hot desert?",choices:["Arabian","Gobi","Sahara","Kalahari"],correct:"Sahara"},
+    {question:"Which instrument has 88 keys?",choices:["Violin","Piano","Organ","Accordion"],correct:"Piano"},
+    {question:"What is the capital of Switzerland?",choices:["Zurich","Geneva","Bern","Basel"],correct:"Bern"},
+    {question:"Which famous scientist discovered radioactivity?",choices:["Marie Curie","Isaac Newton","Albert Einstein","Niels Bohr"],correct:"Marie Curie"},
+    {question:"Which blood vessels carry blood away from the heart?",choices:["Veins","Arteries","Capillaries","Nerves"],correct:"Arteries"},
+    {question:"Which country has the city of Dubai?",choices:["Saudi Arabia","United Arab Emirates","Qatar","Kuwait"],correct:"United Arab Emirates"},
+    {question:"What is the largest lake in Africa?",choices:["Lake Victoria","Lake Tanganyika","Lake Malawi","Lake Chad"],correct:"Lake Victoria"},
+    {question:"Which gas do humans breathe out the most?",choices:["Nitrogen","Carbon Dioxide","Oxygen","Hydrogen"],correct:"Carbon Dioxide"},
+    {question:"Who composed the Four Seasons?",choices:["Mozart","Beethoven","Vivaldi","Bach"],correct:"Vivaldi"},
+    {question:"Which is the largest country in South America?",choices:["Argentina","Brazil","Peru","Colombia"],correct:"Brazil"},
+    {question:"What is the smallest bone in the human body?",choices:["Stapes","Femur","Radius","Ulna"],correct:"Stapes"},
+    {question:"Which continent has the most countries?",choices:["Europe","Africa","Asia","South America"],correct:"Africa"},
+    {question:"Which scientist discovered penicillin?",choices:["Louis Pasteur","Alexander Fleming","Gregor Mendel","Michael Faraday"],correct:"Alexander Fleming"},
+    {question:"What is 19 × 9?",choices:["161","171","181","191"],correct:"171"},
+    {question:"Which country is famous for tulips and windmills?",choices:["Belgium","Denmark","Netherlands","Sweden"],correct:"Netherlands"},
+    {question:"Which is the deepest lake in the world?",choices:["Lake Superior","Lake Victoria","Lake Baikal","Caspian Sea"],correct:"Lake Baikal"},
+    {question:"Which organ pumps blood around the body?",choices:["Brain","Heart","Liver","Lungs"],correct:"Heart"},
+    {question:"What is the capital of Norway?",choices:["Oslo","Stockholm","Helsinki","Copenhagen"],correct:"Oslo"},
+    {question:"Which famous physicist developed the laws of planetary motion?",choices:["Galileo","Kepler","Einstein","Faraday"],correct:"Kepler"},
+    {question:"Which planet is farthest from the Sun?",choices:["Saturn","Uranus","Neptune","Jupiter"],correct:"Neptune"},
+    {question:"How many elements are currently on the periodic table?",choices:["116","117","118","120"],correct:"118"},
+    {question:"Which country hosted the 2016 Summer Olympics?",choices:["China","Brazil","Japan","United Kingdom"],correct:"Brazil"}
+    ];
+
+    const hardQuestions = [
+    {question:"Which element has the highest melting point?",choices:["Iron","Tungsten","Osmium","Titanium"],correct:"Tungsten"},
+    {question:"What is the capital of Kazakhstan?",choices:["Almaty","Astana","Tashkent","Bishkek"],correct:"Astana"},
+    {question:"Who wrote 'Crime and Punishment'?",choices:["Leo Tolstoy","Fyodor Dostoevsky","Anton Chekhov","Victor Hugo"],correct:"Fyodor Dostoevsky"},
+    {question:"Which planet has the longest year?",choices:["Jupiter","Saturn","Uranus","Neptune"],correct:"Neptune"},
+    {question:"What is the SI unit of electrical resistance?",choices:["Volt","Ampere","Ohm","Watt"],correct:"Ohm"},
+    {question:"Which river flows through Budapest?",choices:["Rhine","Danube","Seine","Volga"],correct:"Danube"},
+    {question:"Who developed the laws of planetary motion?",choices:["Galileo","Kepler","Newton","Copernicus"],correct:"Kepler"},
+    {question:"What is the largest internal organ in the human body?",choices:["Heart","Brain","Liver","Lungs"],correct:"Liver"},
+    {question:"Which country is completely surrounded by South Africa?",choices:["Eswatini","Lesotho","Botswana","Namibia"],correct:"Lesotho"},
+    {question:"What is the square root of 625?",choices:["15","20","25","30"],correct:"25"},
+    {question:"Which gas makes up most of the Sun?",choices:["Helium","Hydrogen","Oxygen","Nitrogen"],correct:"Hydrogen"},
+    {question:"Who painted 'The Persistence of Memory'?",choices:["Picasso","Van Gogh","Salvador Dalí","Monet"],correct:"Salvador Dalí"},
+    {question:"Which is the largest moon of Jupiter?",choices:["Europa","Io","Callisto","Ganymede"],correct:"Ganymede"},
+    {question:"What is the hardest mineral on the Mohs scale?",choices:["Quartz","Diamond","Corundum","Topaz"],correct:"Diamond"},
+    {question:"Which empire built Petra?",choices:["Roman","Persian","Nabataean","Ottoman"],correct:"Nabataean"},
+    {question:"What is the chemical symbol for antimony?",choices:["An","At","Sb","Sm"],correct:"Sb"},
+    {question:"Which ocean current keeps Western Europe relatively warm?",choices:["California Current","Gulf Stream","Canary Current","Labrador Current"],correct:"Gulf Stream"},
+    {question:"Which scientist proposed the uncertainty principle?",choices:["Bohr","Heisenberg","Planck","Schrödinger"],correct:"Heisenberg"},
+    {question:"What is the smallest country in Africa?",choices:["Seychelles","Gambia","Eswatini","Djibouti"],correct:"Seychelles"},
+    {question:"How many chromosomes are in a normal human body cell?",choices:["44","46","48","52"],correct:"46"},
+    {question:"Which city hosted the first modern Olympic Games?",choices:["Paris","Athens","Rome","London"],correct:"Athens"},
+    {question:"What is the only mammal capable of true flight?",choices:["Flying Squirrel","Bat","Sugar Glider","Flying Fox"],correct:"Bat"},
+    {question:"Which mathematician is known as the 'Prince of Mathematicians'?",choices:["Euler","Gauss","Newton","Ramanujan"],correct:"Gauss"},
+    {question:"Which mountain range separates Europe and Asia?",choices:["Alps","Andes","Ural Mountains","Carpathians"],correct:"Ural Mountains"},
+    {question:"What is the pH of pure water at room temperature?",choices:["6","7","8","9"],correct:"7"},
+    {question:"Which vitamin contains the element cobalt?",choices:["Vitamin A","Vitamin B12","Vitamin C","Vitamin D"],correct:"Vitamin B12"},
+    {question:"Which treaty ended World War I?",choices:["Treaty of Paris","Treaty of Versailles","Treaty of Vienna","Treaty of Tordesillas"],correct:"Treaty of Versailles"},
+    {question:"Which planet has the largest volcano in the Solar System?",choices:["Earth","Mars","Venus","Mercury"],correct:"Mars"},
+    {question:"Who composed the opera 'The Magic Flute'?",choices:["Beethoven","Mozart","Bach","Handel"],correct:"Mozart"},
+    {question:"What is the largest gland in the human body?",choices:["Pancreas","Thyroid","Liver","Pituitary"],correct:"Liver"},
+    {question:"Which country has the world's highest average elevation?",choices:["Nepal","Bhutan","Tibet","Bolivia"],correct:"Bhutan"},
+    {question:"Which scientist discovered the neutron?",choices:["Rutherford","James Chadwick","Niels Bohr","J. J. Thomson"],correct:"James Chadwick"},
+    {question:"What is the longest cranial nerve in the human body?",choices:["Optic Nerve","Vagus Nerve","Facial Nerve","Trigeminal Nerve"],correct:"Vagus Nerve"},
+    {question:"Which ancient city was buried by the eruption of Mount Vesuvius in AD 79?",choices:["Athens","Pompeii","Sparta","Troy"],correct:"Pompeii"},
+    {question:"Which is the smallest prime number greater than 100?",choices:["101","103","107","109"],correct:"101"},
+    {question:"Which desert covers much of northern China and southern Mongolia?",choices:["Kalahari","Atacama","Gobi","Namib"],correct:"Gobi"},
+    {question:"Which element has the chemical symbol W?",choices:["Tungsten","Tin","Titanium","Tellurium"],correct:"Tungsten"},
+    {question:"Which scientist introduced the three laws of robotics in fiction?",choices:["Arthur C. Clarke","Isaac Asimov","H. G. Wells","Jules Verne"],correct:"Isaac Asimov"},
+    {question:"Which sea separates Europe from Africa?",choices:["Black Sea","Mediterranean Sea","Red Sea","Baltic Sea"],correct:"Mediterranean Sea"},
+    {question:"Which country is home to the ancient city of Petra?",choices:["Jordan","Egypt","Israel","Saudi Arabia"],correct:"Jordan"},
+    {question:"What is the SI unit of force?",choices:["Joule","Pascal","Newton","Watt"],correct:"Newton"},
+    {question:"Who painted 'Girl with a Pearl Earring'?",choices:["Rembrandt","Johannes Vermeer","Claude Monet","Edgar Degas"],correct:"Johannes Vermeer"},
+    {question:"Which blood vessels have the thinnest walls?",choices:["Arteries","Veins","Capillaries","Aorta"],correct:"Capillaries"},
+    {question:"Which country has the world's largest coral reef system?",choices:["Indonesia","Philippines","Australia","Fiji"],correct:"Australia"},
+    {question:"What is the largest lobe of the human brain?",choices:["Occipital","Parietal","Temporal","Frontal"],correct:"Frontal"},
+    {question:"Which scientist discovered the nucleus of the atom?",choices:["Rutherford","Dalton","Bohr","Faraday"],correct:"Rutherford"},
+    {question:"What is the smallest unit of a compound that retains its properties?",choices:["Atom","Electron","Molecule","Ion"],correct:"Molecule"},
+    {question:"Which empire was ruled by Genghis Khan?",choices:["Roman Empire","Mongol Empire","Ottoman Empire","Persian Empire"],correct:"Mongol Empire"},
+    {question:"Which mathematician formulated the famous Last Theorem?",choices:["Euclid","Fermat","Pascal","Euler"],correct:"Fermat"},
+    {question:"Which country is home to the Iguazu Falls?",choices:["Chile","Brazil","Argentina","Both Brazil and Argentina"],correct:"Both Brazil and Argentina"},
+    {question:"Which physicist formulated the equations describing electromagnetism?",choices:["Isaac Newton","James Clerk Maxwell","Michael Faraday","Niels Bohr"],correct:"James Clerk Maxwell"},
+    {question:"What is the only even prime number?",choices:["0","1","2","4"],correct:"2"},
+    {question:"Which country has the longest coastline in the world?",choices:["Russia","Australia","Canada","Indonesia"],correct:"Canada"},
+    {question:"Which organelle is responsible for protein synthesis?",choices:["Mitochondria","Golgi Apparatus","Ribosome","Lysosome"],correct:"Ribosome"},
+    {question:"What is the largest moon of Saturn?",choices:["Rhea","Titan","Enceladus","Iapetus"],correct:"Titan"},
+    {question:"Who wrote 'One Hundred Years of Solitude'?",choices:["Jorge Luis Borges","Gabriel García Márquez","Mario Vargas Llosa","Pablo Neruda"],correct:"Gabriel García Márquez"},
+    {question:"Which element has the highest atomic number that occurs naturally?",choices:["Plutonium","Uranium","Radon","Thorium"],correct:"Uranium"},
+    {question:"Which battle marked Napoleon's final defeat?",choices:["Austerlitz","Leipzig","Waterloo","Trafalgar"],correct:"Waterloo"},
+    {question:"Which country contains the ancient city of Angkor Wat?",choices:["Thailand","Cambodia","Vietnam","Laos"],correct:"Cambodia"},
+    {question:"What is the SI unit of power?",choices:["Volt","Newton","Joule","Watt"],correct:"Watt"},
+    {question:"Which planet has the shortest year?",choices:["Mercury","Venus","Earth","Mars"],correct:"Mercury"},
+    {question:"Which scientist discovered X-rays?",choices:["Wilhelm Röntgen","Marie Curie","Ernest Rutherford","Louis Pasteur"],correct:"Wilhelm Röntgen"},
+    {question:"What is the largest artery in the human body?",choices:["Pulmonary Artery","Carotid Artery","Aorta","Femoral Artery"],correct:"Aorta"},
+    {question:"Which country was formerly known as Ceylon?",choices:["Sri Lanka","Myanmar","Nepal","Bhutan"],correct:"Sri Lanka"},
+    {question:"What is 17²?",choices:["279","289","299","309"],correct:"289"},
+    {question:"Which artist painted 'The Night Watch'?",choices:["Rembrandt","Van Gogh","Monet","Raphael"],correct:"Rembrandt"},
+    {question:"Which ocean surrounds the Maldives?",choices:["Pacific","Atlantic","Indian","Arctic"],correct:"Indian"},
+    {question:"Which blood cells help fight infections?",choices:["Red Blood Cells","Platelets","White Blood Cells","Plasma"],correct:"White Blood Cells"},
+    {question:"Which scientist proposed the heliocentric model of the Solar System?",choices:["Ptolemy","Copernicus","Galileo","Tycho Brahe"],correct:"Copernicus"},
+    {question:"Which country has the highest waterfall in the world?",choices:["Brazil","Venezuela","Peru","Colombia"],correct:"Venezuela"},
+    {question:"What is the largest species of deer?",choices:["Moose","Elk","Reindeer","Red Deer"],correct:"Moose"},
+    {question:"Which philosopher taught Alexander the Great?",choices:["Socrates","Plato","Aristotle","Pythagoras"],correct:"Aristotle"},
+    {question:"Which element has the chemical symbol Cr?",choices:["Calcium","Chromium","Copper","Carbon"],correct:"Chromium"},
+    {question:"Which mountain is the highest outside Asia?",choices:["Denali","Aconcagua","Kilimanjaro","Elbrus"],correct:"Aconcagua"},
+    {question:"Which branch of mathematics studies triangles?",choices:["Algebra","Calculus","Geometry","Trigonometry"],correct:"Trigonometry"},
+    {question:"Which element has the chemical symbol Hg?",choices:["Silver","Mercury","Magnesium","Hydrogen"],correct:"Mercury"},
+    {question:"Which country is home to the ancient ruins of Machu Picchu?",choices:["Chile","Peru","Bolivia","Ecuador"],correct:"Peru"},
+    {question:"Who formulated the law of universal gravitation?",choices:["Galileo","Isaac Newton","Albert Einstein","Johannes Kepler"],correct:"Isaac Newton"},
+    {question:"What is the SI unit of frequency?",choices:["Hertz","Joule","Tesla","Pascal"],correct:"Hertz"},
+    {question:"Which ocean lies between Africa and Australia?",choices:["Atlantic","Pacific","Indian","Arctic"],correct:"Indian"},
+    {question:"Which blood type is known as the universal donor?",choices:["A+","B+","AB+","O-"],correct:"O-"},
+    {question:"Which scientist discovered the electron?",choices:["Ernest Rutherford","J. J. Thomson","Niels Bohr","James Chadwick"],correct:"J. J. Thomson"},
+    {question:"What is the capital of Iceland?",choices:["Oslo","Helsinki","Reykjavik","Stockholm"],correct:"Reykjavik"},
+    {question:"Which organ produces bile?",choices:["Pancreas","Liver","Gallbladder","Kidney"],correct:"Liver"},
+    {question:"Which country has the most volcanoes in the world?",choices:["Japan","Indonesia","United States","Chile"],correct:"Indonesia"},
+    {question:"Which mathematician developed calculus independently alongside Newton?",choices:["Euler","Gauss","Leibniz","Pascal"],correct:"Leibniz"},
+    {question:"What is the largest species of cat?",choices:["Lion","Tiger","Jaguar","Leopard"],correct:"Tiger"},
+    {question:"Which civilization built Chichén Itzá?",choices:["Aztec","Inca","Maya","Olmec"],correct:"Maya"},
+    {question:"Which gas is most abundant in the Earth's atmosphere?",choices:["Oxygen","Nitrogen","Argon","Carbon Dioxide"],correct:"Nitrogen"},
+    {question:"Which country has the world's largest population by area?",choices:["Canada","Russia","China","United States"],correct:"Russia"},
+    {question:"What is the chemical symbol for platinum?",choices:["Pm","Pt","Pl","Pr"],correct:"Pt"},
+    {question:"Which composer became deaf later in life?",choices:["Mozart","Beethoven","Chopin","Haydn"],correct:"Beethoven"},
+    {question:"Which scientist is known as the father of genetics?",choices:["Charles Darwin","Gregor Mendel","Louis Pasteur","Carl Linnaeus"],correct:"Gregor Mendel"},
+    {question:"Which desert is the driest non-polar desert on Earth?",choices:["Sahara","Arabian","Atacama","Kalahari"],correct:"Atacama"},
+    {question:"What is the largest lizard in the world?",choices:["Komodo Dragon","Monitor Lizard","Iguana","Crocodile Monitor"],correct:"Komodo Dragon"},
+    {question:"Which country was formerly known as Persia?",choices:["Iraq","Iran","Turkey","Afghanistan"],correct:"Iran"},
+    {question:"Which branch of biology studies fungi?",choices:["Botany","Ecology","Mycology","Entomology"],correct:"Mycology"},
+    {question:"Which famous telescope was launched into space in 1990?",choices:["James Webb Space Telescope","Kepler Telescope","Hubble Space Telescope","Chandra Observatory"],correct:"Hubble Space Telescope"},
+    {question:"What is the largest island in the Mediterranean Sea?",choices:["Cyprus","Corsica","Sardinia","Sicily"],correct:"Sicily"},
+    {question:"Which scientist proposed the continental drift theory?",choices:["Alfred Wegener","Charles Lyell","James Hutton","Alexander von Humboldt"],correct:"Alfred Wegener"}
+    ];
+
+    const insaneQuestions = [
+    {question:"Which element has the highest electrical conductivity at room temperature?",choices:["Copper","Silver","Gold","Aluminum"],correct:"Silver"},
+    {question:"Who wrote 'The Prince'?",choices:["Niccolò Machiavelli","Plato","Thomas Hobbes","Voltaire"],correct:"Niccolò Machiavelli"},
+    {question:"Which star is closest to the Sun?",choices:["Sirius","Alpha Centauri A","Proxima Centauri","Barnard's Star"],correct:"Proxima Centauri"},
+    {question:"What is the SI base unit of luminous intensity?",choices:["Lux","Lumen","Candela","Nit"],correct:"Candela"},
+    {question:"Which particle is responsible for the strong nuclear force?",choices:["Photon","Gluon","Boson","Muon"],correct:"Gluon"},
+    {question:"Which country has the longest uninterrupted national anthem?",choices:["Greece","Uruguay","Russia","Chile"],correct:"Greece"},
+    {question:"Who discovered the expansion of the universe through galaxy redshifts?",choices:["Edwin Hubble","Albert Einstein","Carl Sagan","Tycho Brahe"],correct:"Edwin Hubble"},
+    {question:"Which Roman emperor built a massive wall across northern Britain?",choices:["Augustus","Hadrian","Trajan","Nero"],correct:"Hadrian"},
+    {question:"What is the rarest blood type in the ABO system?",choices:["A","B","AB","O"],correct:"AB"},
+    {question:"Which moon of Saturn is known for its dense atmosphere?",choices:["Enceladus","Titan","Rhea","Dione"],correct:"Titan"},
+    {question:"What is the largest dwarf planet in the Solar System?",choices:["Pluto","Eris","Haumea","Makemake"],correct:"Pluto"},
+    {question:"Which scientist first proposed the atomic theory in the early 1800s?",choices:["John Dalton","Niels Bohr","J. J. Thomson","Ernest Rutherford"],correct:"John Dalton"},
+    {question:"Which battle ended Napoleon's Hundred Days campaign?",choices:["Austerlitz","Borodino","Waterloo","Leipzig"],correct:"Waterloo"},
+    {question:"Which mathematician invented logarithms?",choices:["Isaac Newton","John Napier","Leonhard Euler","Pierre de Fermat"],correct:"John Napier"},
+    {question:"Which acid is found in car batteries?",choices:["Nitric Acid","Hydrochloric Acid","Sulfuric Acid","Acetic Acid"],correct:"Sulfuric Acid"},
+    {question:"Which civilization created the famous Nazca Lines?",choices:["Inca","Nazca","Maya","Olmec"],correct:"Nazca"},
+    {question:"Which Nobel Prize category was added last?",choices:["Peace","Economics","Chemistry","Literature"],correct:"Economics"},
+    {question:"Which planet has the greatest average density?",choices:["Mercury","Earth","Venus","Neptune"],correct:"Earth"},
+    {question:"Who composed the 'Moonlight Sonata'?",choices:["Mozart","Beethoven","Chopin","Schubert"],correct:"Beethoven"},
+    {question:"Which vitamin is also known as ascorbic acid?",choices:["Vitamin A","Vitamin B12","Vitamin C","Vitamin K"],correct:"Vitamin C"},
+    {question:"Which sea separates Saudi Arabia from Africa?",choices:["Mediterranean Sea","Arabian Sea","Red Sea","Black Sea"],correct:"Red Sea"},
+    {question:"What is the hardest known naturally occurring mineral?",choices:["Diamond","Corundum","Topaz","Quartz"],correct:"Diamond"},
+    {question:"Which philosopher taught Plato?",choices:["Aristotle","Socrates","Epicurus","Pythagoras"],correct:"Socrates"},
+    {question:"Which gas giant has the shortest rotation period?",choices:["Jupiter","Saturn","Uranus","Neptune"],correct:"Jupiter"},
+    {question:"Which scientist won two Nobel Prizes in two different sciences?",choices:["Albert Einstein","Marie Curie","Niels Bohr","Linus Pauling"],correct:"Marie Curie"},
+    {question:"Which branch of mathematics studies the properties of whole numbers?",choices:["Topology","Calculus","Number Theory","Statistics"],correct:"Number Theory"},
+    {question:"Who discovered the neutron in 1932?",choices:["Ernest Rutherford","James Chadwick","Niels Bohr","J. J. Thomson"],correct:"James Chadwick"},
+    {question:"Which galaxy is expected to collide with the Milky Way in about 4.5 billion years?",choices:["Triangulum Galaxy","Whirlpool Galaxy","Andromeda Galaxy","Sombrero Galaxy"],correct:"Andromeda Galaxy"},
+    {question:"What is the SI unit of electric charge?",choices:["Ampere","Volt","Coulomb","Farad"],correct:"Coulomb"},
+    {question:"Which emperor was the first ruler of a unified China?",choices:["Qin Shi Huang","Kublai Khan","Emperor Wu","Tang Taizong"],correct:"Qin Shi Huang"},
+    {question:"Which element has the highest atomic number that occurs naturally?",choices:["Plutonium","Uranium","Radium","Thorium"],correct:"Uranium"},
+    {question:"Which composer wrote 'The Four Seasons'?",choices:["Bach","Vivaldi","Handel","Haydn"],correct:"Vivaldi"},
+    {question:"Which branch of biology deals with classification of organisms?",choices:["Ecology","Taxonomy","Genetics","Mycology"],correct:"Taxonomy"},
+    {question:"Which is the largest moon in the Solar System?",choices:["Titan","Europa","Ganymede","Callisto"],correct:"Ganymede"},
+    {question:"Which scientist formulated the Pauli Exclusion Principle?",choices:["Werner Heisenberg","Wolfgang Pauli","Max Planck","Erwin Schrödinger"],correct:"Wolfgang Pauli"},
+    {question:"Which country is completely surrounded by Italy?",choices:["Monaco","San Marino","Liechtenstein","Andorra"],correct:"San Marino"},
+    {question:"What is the only continent that lies entirely in the Northern Hemisphere?",choices:["Europe","North America","Asia","None of the above"],correct:"Europe"},
+    {question:"Which artist sculpted 'David'?",choices:["Donatello","Bernini","Michelangelo","Rodin"],correct:"Michelangelo"},
+    {question:"What is the SI unit of capacitance?",choices:["Henry","Farad","Tesla","Weber"],correct:"Farad"},
+    {question:"Which ocean trench is the deepest known point on Earth?",choices:["Java Trench","Tonga Trench","Mariana Trench","Peru–Chile Trench"],correct:"Mariana Trench"},
+    {question:"Who wrote 'The Divine Comedy'?",choices:["Virgil","Dante Alighieri","Homer","Geoffrey Chaucer"],correct:"Dante Alighieri"},
+    {question:"Which physicist introduced the quantum hypothesis in 1900?",choices:["Einstein","Bohr","Max Planck","Dirac"],correct:"Max Planck"},
+    {question:"Which vitamin is primarily responsible for blood clotting?",choices:["Vitamin A","Vitamin C","Vitamin D","Vitamin K"],correct:"Vitamin K"},
+    {question:"Which civilization built the city of Teotihuacan?",choices:["Aztec","Maya","Its original builders are unknown","Inca"],correct:"Its original builders are unknown"},
+    {question:"Which element has the chemical symbol Hf?",choices:["Holmium","Hafnium","Hydrogen","Hassium"],correct:"Hafnium"},
+    {question:"Which mathematician developed non-Euclidean geometry alongside János Bolyai?",choices:["Carl Friedrich Gauss","Bernhard Riemann","Nikolai Lobachevsky","David Hilbert"],correct:"Nikolai Lobachevsky"},
+    {question:"Which planet has the highest average surface gravity?",choices:["Saturn","Earth","Jupiter","Neptune"],correct:"Jupiter"},
+    {question:"Which scientist first measured the speed of light using a terrestrial experiment?",choices:["Ole Rømer","Albert Michelson","Hippolyte Fizeau","Galileo"],correct:"Hippolyte Fizeau"},
+    {question:"Which empire constructed the Hagia Sophia?",choices:["Roman","Ottoman","Byzantine","Persian"],correct:"Byzantine"},
+    {question:"Which mountain is the highest active volcano in the world?",choices:["Mount Etna","Ojos del Salado","Cotopaxi","Mount Erebus"],correct:"Ojos del Salado"},
+    {question:"Which scientist derived the equations describing blackbody radiation that led to quantum theory?",choices:["Max Planck","Niels Bohr","Paul Dirac","Werner Heisenberg"],correct:"Max Planck"},
+    {question:"What is the largest known structure in the observable universe?",choices:["Virgo Supercluster","Laniakea Supercluster","Hercules–Corona Borealis Great Wall","Sloan Great Wall"],correct:"Hercules–Corona Borealis Great Wall"},
+    {question:"Which element has the highest boiling point?",choices:["Carbon","Tungsten","Rhenium","Osmium"],correct:"Rhenium"},
+    {question:"Who wrote the philosophical work 'Thus Spoke Zarathustra'?",choices:["Immanuel Kant","Friedrich Nietzsche","Arthur Schopenhauer","Jean-Paul Sartre"],correct:"Friedrich Nietzsche"},
+    {question:"Which mathematical constant is known as Apéry's constant?",choices:["π","e","ζ(3)","φ"],correct:"ζ(3)"},
+    {question:"Which moon of Jupiter is the most volcanically active body in the Solar System?",choices:["Europa","Io","Ganymede","Callisto"],correct:"Io"},
+    {question:"Which country has the world's oldest continuously operating parliament?",choices:["United Kingdom","Greece","Iceland","Norway"],correct:"Iceland"},
+    {question:"What is the SI unit of magnetic flux?",choices:["Tesla","Henry","Weber","Gauss"],correct:"Weber"},
+    {question:"Which scientist introduced the Dirac equation?",choices:["Paul Dirac","Richard Feynman","Erwin Schrödinger","Enrico Fermi"],correct:"Paul Dirac"},
+    {question:"Which civilization first developed cuneiform writing?",choices:["Babylonians","Assyrians","Sumerians","Hittites"],correct:"Sumerians"},
+    {question:"Which blood vessel carries oxygenated blood from the lungs to the heart?",choices:["Pulmonary Artery","Aorta","Pulmonary Vein","Vena Cava"],correct:"Pulmonary Vein"},
+    {question:"Which artist painted 'Las Meninas'?",choices:["Francisco Goya","Diego Velázquez","El Greco","Salvador Dalí"],correct:"Diego Velázquez"},
+    {question:"Which mountain range contains K2?",choices:["Himalayas","Andes","Karakoram","Tien Shan"],correct:"Karakoram"},
+    {question:"Which scientist proposed the exclusion principle bearing his name?",choices:["Niels Bohr","Wolfgang Pauli","Erwin Schrödinger","Louis de Broglie"],correct:"Wolfgang Pauli"},
+    {question:"What is the rarest naturally occurring stable element?",choices:["Gold","Platinum","Tantalum","Indium"],correct:"Indium"},
+    {question:"Which philosopher wrote 'Leviathan'?",choices:["John Locke","Thomas Hobbes","David Hume","Jean-Jacques Rousseau"],correct:"Thomas Hobbes"},
+    {question:"Which ocean current flows along the eastern coast of the United States?",choices:["Canary Current","California Current","Gulf Stream","Benguela Current"],correct:"Gulf Stream"},
+    {question:"Which element has the chemical symbol Re?",choices:["Radium","Rhenium","Rutherfordium","Rhodium"],correct:"Rhenium"},
+    {question:"Who discovered electromagnetic induction?",choices:["James Clerk Maxwell","Michael Faraday","André-Marie Ampère","Alessandro Volta"],correct:"Michael Faraday"},
+    {question:"Which city was the capital of the Byzantine Empire?",choices:["Athens","Constantinople","Rome","Antioch"],correct:"Constantinople"},
+    {question:"Which branch of mathematics studies rates of change?",choices:["Topology","Calculus","Number Theory","Combinatorics"],correct:"Calculus"},
+    {question:"Which scientist first proposed the concept of natural selection?",choices:["Gregor Mendel","Charles Darwin","Alfred Russel Wallace","Both Darwin and Wallace"],correct:"Both Darwin and Wallace"},
+    {question:"Which gas giant has the strongest magnetic field in the Solar System?",choices:["Saturn","Neptune","Uranus","Jupiter"],correct:"Jupiter"},
+    {question:"What is the SI unit of inductance?",choices:["Farad","Tesla","Henry","Weber"],correct:"Henry"},
+    {question:"Which civilization built the ziggurats of Mesopotamia?",choices:["Egyptians","Sumerians","Phoenicians","Persians"],correct:"Sumerians"},
+    {question:"Which mathematician proved Fermat's Last Theorem in 1994?",choices:["Terence Tao","Andrew Wiles","John Conway","Grigori Perelman"],correct:"Andrew Wiles"},
+    {question:"Which particle is the force carrier of the weak nuclear interaction?",choices:["Photon","Gluon","W and Z bosons","Graviton"],correct:"W and Z bosons"},
+    {question:"Which country contains the ancient rock-hewn churches of Lalibela?",choices:["Ethiopia","Egypt","Sudan","Eritrea"],correct:"Ethiopia"},
+    {question:"Which physicist developed the general theory of relativity?",choices:["Isaac Newton","Albert Einstein","Max Planck","Niels Bohr"],correct:"Albert Einstein"},
+    {question:"What is the SI base unit of thermodynamic temperature?",choices:["Celsius","Fahrenheit","Kelvin","Rankine"],correct:"Kelvin"},
+    {question:"Which mathematician is known for the Euler identity?",choices:["Carl Friedrich Gauss","Leonhard Euler","Joseph Lagrange","Pierre-Simon Laplace"],correct:"Leonhard Euler"},
+    {question:"Which civilization created the world's oldest known epic, the 'Epic of Gilgamesh'?",choices:["Babylonians","Sumerians","Assyrians","Hittites"],correct:"Sumerians"},
+    {question:"Which blood protein is primarily responsible for oxygen transport?",choices:["Myoglobin","Hemoglobin","Albumin","Fibrinogen"],correct:"Hemoglobin"},
+    {question:"Which star is the brightest in the night sky?",choices:["Canopus","Arcturus","Sirius","Vega"],correct:"Sirius"},
+    {question:"Which scientist formulated the law of universal gravitation?",choices:["Johannes Kepler","Galileo Galilei","Isaac Newton","Tycho Brahe"],correct:"Isaac Newton"},
+    {question:"Which desert is the largest desert on Earth?",choices:["Sahara","Arabian","Antarctic Polar Desert","Gobi"],correct:"Antarctic Polar Desert"},
+    {question:"Which philosopher wrote 'Critique of Pure Reason'?",choices:["John Locke","Immanuel Kant","René Descartes","Baruch Spinoza"],correct:"Immanuel Kant"},
+    {question:"Which element has atomic number 92?",choices:["Thorium","Uranium","Plutonium","Radium"],correct:"Uranium"},
+    {question:"Which moon is the largest natural satellite of Neptune?",choices:["Proteus","Nereid","Triton","Larissa"],correct:"Triton"},
+    {question:"Which artist painted 'The School of Athens'?",choices:["Leonardo da Vinci","Raphael","Michelangelo","Titian"],correct:"Raphael"},
+    {question:"Which branch of biology studies insects?",choices:["Entomology","Ornithology","Herpetology","Ichthyology"],correct:"Entomology"},
+    {question:"Which city is home to the Forbidden City?",choices:["Seoul","Kyoto","Beijing","Shanghai"],correct:"Beijing"},
+    {question:"Which scientist is credited with discovering radio waves experimentally?",choices:["Nikola Tesla","Heinrich Hertz","Guglielmo Marconi","James Clerk Maxwell"],correct:"Heinrich Hertz"},
+    {question:"Which ocean is the saltiest on average?",choices:["Atlantic","Indian","Pacific","Arctic"],correct:"Atlantic"},
+    {question:"Which mathematician invented the Cartesian coordinate system?",choices:["Blaise Pascal","René Descartes","Euclid","Isaac Newton"],correct:"René Descartes"},
+    {question:"Which civilization built the ancient city of Carthage?",choices:["Romans","Phoenicians","Greeks","Etruscans"],correct:"Phoenicians"},
+    {question:"Which element has the chemical symbol Ir?",choices:["Iridium","Indium","Iodine","Iron"],correct:"Iridium"},
+    {question:"Which scientist first accurately calculated Earth's circumference?",choices:["Aristotle","Eratosthenes","Ptolemy","Hipparchus"],correct:"Eratosthenes"},
+    {question:"Which country is home to the monastery of Paro Taktsang, also known as Tiger's Nest?",choices:["Nepal","Bhutan","Tibet","Mongolia"],correct:"Bhutan"},
+    {question:"Which branch of mathematics deals with the study of networks and connected structures?",choices:["Topology","Graph Theory","Linear Algebra","Complex Analysis"],correct:"Graph Theory"}
+    ];
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        let selectedDifficulty = "";
+        let quizQuestions=[];
+        let currentQuestionIndex=0;
+        let score=0;
+        let pName="";
+        let streak = 0;
+        let highScores = {
+            easy: Number(localStorage.getItem("easyHighScore")) || 0,
+            medium: Number(localStorage.getItem("mediumHighScore")) || 0,
+            hard: Number(localStorage.getItem("hardHighScore")) || 0,
+            insane: Number(localStorage.getItem("insaneHighScore")) || 0
+        };
+        let timer;
+        let timeLeft;
+        let stats = JSON.parse(localStorage.getItem("quizStats")) || {
+            gamesPlayed: 0,
+            totalScore: 0,
+            highestScore: 0,
+            easyHighScore: 0,
+            mediumHighScore: 0,
+            hardHighScore: 0,
+            insaneHighScore: 0,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            timedOut: 0,
+            totalQuestions: 0,
+            longestStreak: 0,
+            perfectGames: 0
+        };
+
+        function saveStats(){
+            localStorage.setItem("quizStats", JSON.stringify(stats));
+        }
+            
+        const correctSound = new Audio("soundeffects/correct.mp3");
+        const wrongSound = new Audio("soundeffects/wrong.mp3");
+        const tickingSound = new Audio("soundeffects/ticking.mp3");
+        const streak3Sound = new Audio("soundeffects/streak3.mp3");
+        const streak15Sound = new Audio("soundeffects/streak15.mp3");
+
+        document.querySelectorAll(".difficulty-btn").forEach(button => {
+
+        button.onclick = function(){
+
+        if(this.classList.contains("selected")) {
+
+            this.classList.remove("selected");
+            selectedDifficulty = "";
+
+        } else {
+
+            document.querySelectorAll(".difficulty-btn")
+            .forEach(btn => btn.classList.remove("selected"));
+
+            this.classList.add("selected");
+
+            selectedDifficulty = this.innerText.toLowerCase();
+
+        }
+
+        console.log(selectedDifficulty);
+
+        };
+
+        });
+
+        function updateStreak(){
+        document.getElementById("streak").innerText =
+        "🔥 " + streak;
+        }
+        
+        function startGame(){
+
+        gameCounted = false;
+
+        localStorage.setItem("previousXP", playerXP);
+
+        let nameBox=document.getElementById("player-name");
+
+        let nameError=document.getElementById("name-error");
+
+        let diffError=document.getElementById("difficulty-error");
+
+
+        if(!nameError){
+
+            nameError=document.createElement("p");
+            nameError.id="name-error";
+            nameBox.after(nameError);
+
+        }
+
+
+        if(!diffError){
+
+            diffError=document.createElement("p");
+            diffError.id="difficulty-error";
+            document.querySelector(".difficulty-menu").after(diffError);
+
+        }
+
+
+        nameError.style.color="#e53e3e";
+        diffError.style.color="#e53e3e";
+
+
+        nameError.innerText="";
+        diffError.innerText="";
+
+
+        let name=nameBox.value.trim();
+
+
+        let failed=false;
+
+
+        if(name===""){
+
+            nameError.innerText="Didn't enter player name!";
+            failed=true;
+
+        }
+
+
+        if(selectedDifficulty===""){
+
+            diffError.innerText="Didn't enter difficulty level!";
+            failed=true;
+
+        }
+
+        if(failed)return;
+        pName=name;
+        score = 0;
+        streak = 0;
+        document.getElementById("streak").style.display = "none";
+        updateStreak();
+
+
+        if(selectedDifficulty==="easy")
+            quizQuestions = shuffle([...easyQuestions]).slice(0,20);
+
+        if(selectedDifficulty==="medium")
+            quizQuestions = shuffle([...mediumQuestions]).slice(0,20);
+
+        if(selectedDifficulty==="hard")
+            quizQuestions = shuffle([...hardQuestions]).slice(0,20);
+
+        if(selectedDifficulty==="insane")
+            quizQuestions = shuffle([...insaneQuestions]).slice(0,20);
+
+        quizQuestions.sort(() => Math.random() - 0.5);
+
+
+        document.getElementById("setup-screen")
+        .classList.add("hidden");
+
+
+        document.getElementById("quiz-screen")
+        .classList.remove("hidden");
+
+        document.getElementById("timer").style.display = "block";
+
+        loadQuestion();
+
+        }
+        
+        function loadQuestion(){
+        
+        document.getElementById("feedback-container")
+        .classList.add("hidden");
+        
+        const nextButton = document.querySelector(".btn-next");
+
+        if (currentQuestionIndex === quizQuestions.length - 1) {
+            nextButton.innerText = "Show Results 📊";
+        } else {
+            nextButton.innerText = "Next Question →";
+        }
+
+        let q=quizQuestions[currentQuestionIndex];
+        
+        
+        document.getElementById("question-number")
+        .innerText=`Question ${currentQuestionIndex+1} of ${quizQuestions.length}`;
+        
+        
+        document.getElementById("question-title")
+        .innerText=q.question;
+        
+        
+        let box=document.getElementById("choices-box");
+        
+        box.innerHTML="";
+        
+        
+        let shuffledChoices = [...q.choices];
+
+        shuffledChoices.sort(() => Math.random() - 0.5);
+
+        shuffledChoices.forEach(choice=>{
+
+        let b=document.createElement("button");
+
+        b.className="choice-btn";
+
+        b.innerText=choice;
+
+        b.onclick=()=>checkAnswer(choice,b);
+
+        box.appendChild(b);
+        
+        });
+
+        startTimer();
+        
+        }
+
+        function startTimer(){
+
+        clearInterval(timer);
+
+        if(selectedDifficulty==="easy")
+        timeLeft=20;
+
+        if(selectedDifficulty==="medium")
+        timeLeft=15;
+
+        if(selectedDifficulty==="hard")
+        timeLeft=10;
+
+        if(selectedDifficulty==="insane")
+        timeLeft=7;
+
+        updateTimer();
+
+        timer=setInterval(function(){
+
+        timeLeft--;
+
+        updateTimer();
+
+        if (timeLeft === 5) {
+            tickingSound.currentTime = 0;
+            tickingSound.play();
+        }
+
+        if(timeLeft<=0){
+
+        clearInterval(timer);
+
+        timeOut();
+
+        }
+
+        },1000);
+
+        }
+
+        function updateTimer(){
+
+        let timerBox=document.getElementById("timer");
+
+        timerBox.innerText="⏱️ Time Left: "+timeLeft;
+
+        if(timeLeft>5){
+
+        timerBox.style.color="#2ecc71";
+
+        }
+
+        else if(timeLeft>3){
+
+        timerBox.style.color="#f39c12";
+
+        }
+
+        else{
+
+        timerBox.style.color="#e74c3c";
+
+        }
+
+        }
+
+        function timeOut(){
+
+        tickingSound.pause();
+        tickingSound.currentTime = 0;
+        stats.timedOut++;
+        stats.totalQuestions++;
+        streak = 0;
+        updateStreak();
+        saveStats();
+        document.getElementById("streak").style.display = "none";
+        updateStreak();
+
+        let q=quizQuestions[currentQuestionIndex];
+
+        document.querySelectorAll(".choice-btn").forEach(button=>{
+
+        button.disabled=true;
+
+        if(button.innerText.startsWith(q.correct)){
+
+        button.classList.add("correct-choice");
+
+        }
+
+        });
+
+        document.getElementById("feedback-container")
+        .classList.remove("hidden");
+
+        let correct=q.choices.find(choice=>choice.startsWith(q.correct));
+
+        document.getElementById("feedback-text").innerText=
+        "⏰ Time's up! The correct answer was "+correct;
+
+        }
+                        
+        function checkAnswer(answer,button){
+
+        clearInterval(timer); // Stop the timer immediately
+
+        tickingSound.pause();
+        tickingSound.currentTime = 0;
+
+        let q=quizQuestions[currentQuestionIndex];
+
+        document.querySelectorAll(".choice-btn")
+        .forEach(b=>b.disabled=true);
+
+        document.getElementById("feedback-container")
+        .classList.remove("hidden");
+
+        let text=document.getElementById("feedback-text");
+
+
+        let correctAnswerText = q.choices.find(choice =>
+            choice.startsWith(q.correct)
+        );
+
+        if(answer.startsWith(q.correct)){
+            
+            score++;
+
+            earnXP(2)
+
+            stats.correctAnswers++;
+
+            stats.totalQuestions++;
+            
+            saveStats();
+
+            streak++;
+
+            let quests = JSON.parse(localStorage.getItem("dailyQuests"));
+
+        if (quests) {
+
+            const quest = quests.list[quests.currentQuest];
+
+            if (quest.type === "streak" && !quest.completed) {
+
+                if (streak > quest.progress) {
+
+                    quest.progress = streak;
+
+                }
+
+                if (quest.progress >= quest.goal) {
+
+                    quest.progress = quest.goal;
+                    quest.completed = true;
+
+                }
+
+                localStorage.setItem(
+                    "dailyQuests",
+                    JSON.stringify(quests)
+                );
+
+            }
+
+        }
+        
+        let perfectQuest = quests.list[quests.currentQuest];
+
+        if (perfectQuest.type === "perfectGame" && !perfectQuest.completed) {
+
+            perfectQuest.progress = score;
+
+            if (perfectQuest.progress >= perfectQuest.goal) {
+                perfectQuest.progress = perfectQuest.goal;
+                perfectQuest.completed = true;
+            }
+
+            localStorage.setItem(
+                "dailyQuests",
+                JSON.stringify(quests)
+            );
+
+        }
+
+        if (streak > stats.longestStreak) {
+            stats.longestStreak = streak;
+        }
+
+        document.getElementById("streak").style.display = "block";
+        updateStreak();
+
+        if (streak === 3) {
+            earnXP(3);
+            streak3Sound.currentTime = 0;
+            streak3Sound.play();
+            showStreakPopup("🔥 ON FIRE!");
+        }
+        else if (streak === 5) {
+            earnXP(3);
+            correctSound.currentTime = 0;
+            correctSound.play();
+            showStreakPopup("⚡ UNSTOPPABLE!");
+        }
+        else if (streak === 10) {
+            earnXP(3);
+            correctSound.currentTime = 0;
+            correctSound.play();
+            showStreakPopup("💯 TRIVIA MASTER!");
+        }
+        else if (streak === 15) {
+            earnXP(3);
+            streak15Sound.currentTime = 0;
+            streak15Sound.play();
+            showStreakPopup("👑 TRIVIA GOD!");
+        }
+        else if (streak === 20) {
+            correctSound.currentTime = 0;
+            correctSound.play();
+            showStreakPopup("🎯 FULL SCORE!");
+        }
+        else {
+            correctSound.currentTime = 0;
+            correctSound.play();
+        }
+
+        button.classList.add("correct-choice");
+
+        text.innerText =
+        `✅ Correct! Great job.`;
+        }
+        else{
+
+            wrongSound.currentTime = 0;
+            wrongSound.play();
+            stats.wrongAnswers++;
+            stats.totalQuestions++;
+            streak = 0;
+            saveStats();
+            document.getElementById("streak").style.display = "none";
+            updateStreak();
+
+            button.classList.add("incorrect-choice");
+
+
+            document.querySelectorAll(".choice-btn")
+            .forEach(b=>{
+
+                if(b.innerText.startsWith(q.correct)){
+                    b.classList.add("correct-choice");
+                }
+
+            });
+
+
+            text.innerText =
+            "❌ Incorrect! The correct answer was " + correctAnswerText.substring(0) + ".";
+
+        }
+
+        }
+
+        function showStreakPopup(message){
+
+        const container = document.getElementById("streak-container");
+
+        const popup = document.createElement("div");
+
+        popup.className = "streak-popup";
+
+        popup.innerText = message;
+
+        container.appendChild(popup);
+
+        setTimeout(()=>{
+            popup.remove();
+        },1000);
+
+        }
+        
+        function nextQuestion(){
+
+        currentQuestionIndex++;
+
+        if(currentQuestionIndex < quizQuestions.length){
+
+            loadQuestion();
+
+        }
+        else{
+
+            setTimeout(() => {
+                showResults();
+            }, 1000); // wait 1 second so the FULL SCORE popup can be seen
+
+        }
+
+        }
+        
+        function showResults(){
+
+        stats.gamesPlayed++;
+
+        let quests = JSON.parse(localStorage.getItem("dailyQuests"));
+
+        if (quests) {
+
+            const quest = quests.list[quests.currentQuest];
+
+            if (quest.type === "gamesPlayed" && !quest.completed) {
+
+                quest.progress++;
+
+                if (quest.progress >= quest.goal) {
+
+                    quest.progress = quest.goal;
+                    quest.completed = true;
+
+                }
+
+                localStorage.setItem(
+                    "dailyQuests",
+                    JSON.stringify(quests)
+                );
+
+            }
+
+        }
+
+        stats.totalScore += score;
+
+        if (score > stats.highestScore) {
+            stats.highestScore = score;
+        }
+
+        if (selectedDifficulty === "easy" && score > stats.easyHighScore) {
+            stats.easyHighScore = score;
+        }
+
+        if (selectedDifficulty === "medium" && score > stats.mediumHighScore) {
+            stats.mediumHighScore = score;
+        }
+
+        if (selectedDifficulty === "hard" && score > stats.hardHighScore) {
+            stats.hardHighScore = score;
+        }
+
+        if (selectedDifficulty === "insane" && score > stats.insaneHighScore) {
+            stats.insaneHighScore = score;
+        }
+
+        if (score === quizQuestions.length) {
+            stats.perfectGames++;
+            earnXP(5)
+        }
+        saveStats();
+
+        document.getElementById("timer").style.display = "none";
+
+        clearInterval(timer);
+
+        let rank;
+
+        if (score > highScores[selectedDifficulty]) {
+
+            highScores[selectedDifficulty] = score;
+
+            localStorage.setItem(
+                selectedDifficulty + "HighScore",
+                score
+            );
+
+        }
+
+        if(score>=18)rank="🌟 Legend";
+        else if(score>=14)rank="🚀 Expert";
+        else if(score>=10)rank="⭐ Skilled";
+        else rank="🛰 Beginner";
+
+
+        document.getElementById("question-number")
+        .innerText="Challenge Completed!";
+
+
+        document.getElementById("question-title")
+        .innerText=`Great game, ${pName}!`;
+
+
+        document.getElementById("choices-box")
+        .innerHTML=
+        `
+        <div class="rank-badge">
+        ${rank}<br>
+        Final Score: ${score}/20
+        <br>
+        🏆 ${selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1)} High Score: ${highScores[selectedDifficulty]}/20
+        </div>
+
+        <button onclick="playAgain()" class="btn btn-play-again">
+            Play Again
+        </button>
+        `;
+
+        document.getElementById("feedback-container")
+        .classList.add("hidden");
+
+        if (!gameCounted) {
+
+            let gamesPlayed = Number(localStorage.getItem("gamesPlayed")) || 0;
+
+            gamesPlayed++
+
+            localStorage.setItem("gamesPlayed", gamesPlayed);
+
+            earnXP(10);
+
+            gameCounted = true;
+        }
+
+        }
+
+        function playAgain(){
+
+        currentQuestionIndex = 0;
+        score = 0;
+
+        document.getElementById("quiz-screen")
+        .classList.add("hidden");
+
+
+        document.getElementById("setup-screen")
+        .classList.remove("hidden");
+
+
+        document.getElementById("player-name").value="";
+
+
+        selectedDifficulty="";
+
+
+        document.querySelectorAll(".difficulty-btn")
+        .forEach(btn=>{
+            btn.classList.remove("selected");
+        });
+
+        }
+        
+        </script>
+
+        <audio id="bg-music" loop preload="auto">
+            <source src="music/play.mp3" type="audio/mpeg">
+          </audio>
+
+          <audio id="button-click" preload="auto">
+            <source src="soundeffects/buttonclick.mp3" type="audio/mpeg">
+        </audio>
+          
+          <script>
+
+          function startMusic() {
+              const music = document.getElementById("bg-music");
+              music.volume = 1;
+              music.play().catch(() => {});
+          }
+        
+        // start on ANY user interaction
+        document.addEventListener("click", startMusic, { once: true });
+        document.addEventListener("keydown", startMusic, { once: true });
+        
+        const buttonClick = document.getElementById("button-click");
+        buttonClick.volume = 1;
+
+        function playButtonClick() {
+            buttonClick.currentTime = 0;
+            buttonClick.play();
+        }
+
+        // Name box
+        document.getElementById("player-name").addEventListener("click", playButtonClick);
+
+        // Difficulty buttons
+        document.querySelectorAll(".difficulty-btn").forEach(button => {
+            button.addEventListener("click", playButtonClick);
+        });
+
+        // Start Game button
+        document.querySelector(".btn-start").addEventListener("click", playButtonClick);
+
+        // Home button
+        const homeBtn = document.querySelector(".btn-home");
+        if (homeBtn) {
+            homeBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                playButtonClick();
+
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 120);
+            });
+        }
+
+        // Next Question / Show Results button
+        const nextBtn = document.querySelector(".btn-next");
+        if (nextBtn) {
+            nextBtn.addEventListener("click", playButtonClick);
+        }
+
+        // Quit & Return Home button
+        const quitBtn = document.querySelector(".btn-quit");
+        if (quitBtn) {
+            quitBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                playButtonClick();
+
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 120);
+            });
+        }
+
+        // Play Again button
+        document.addEventListener("click", function(e) {
+            if (e.target.classList.contains("btn-play-again")) {
+                playButtonClick();
+            }
+        });
+        
+        </script>
+
+</body>
+</html>

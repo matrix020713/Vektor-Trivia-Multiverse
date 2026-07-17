@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vektor - Daily Challenges</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #0a0f1d 0%, #03050a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .star-field {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .star-field::after {
+            content: '';
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 
+                10vw 15vh 1px #fff, 25vw 35vh 2px #fff, 85vw 12vh 1px #fff,
+                5vw 65vh 2px #fff, 40vw 50vh 1px #fff, 75vw 70vh 2px #fff,
+                20vw 85vh 1px #fff, 60vw 92vh 2px #fff, 92vw 55vh 1px #fff,
+                15vw 40vh 1px #fff, 55vw 78vh 2px #fff, 80vw 35vh 1px #fff,
+                33vw 65vh 1px #fff, 68vw 18vh 2px #fff, 95vw 88vh 1px #fff;
+            animation: spaceTwinkle 4s ease-in-out infinite alternate;
+        }
+        @keyframes spaceTwinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .space-object {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .black-hole {
+            top: 15vh;
+            left: 5vw;
+            width: 90px;
+            height: 90px;
+            background: #000;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #000, 0 0 40px #7000ff, 0 0 60px #ff007f;
+            animation: floatingGlow 6s infinite ease-in-out;
+        }
+        .black-hole::before {
+            content: '';
+            position: absolute;
+            top: -12px; left: -12px; right: -12px; bottom: -12px;
+            border: 3px double rgba(0, 242, 254, 0.4);
+            border-radius: 50%;
+            border-left-color: transparent;
+            border-right-color: transparent;
+            animation: rotateRing 8s infinite linear;
+        }
+        .gas-giant {
+            bottom: 12vh;
+            right: 5vw;
+            width: 95px;
+            height: 95px;
+            background: linear-gradient(135deg, #ff7a63 0%, #7000ff 100%);
+            border-radius: 50%;
+            box-shadow: inset -15px -15px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255, 122, 99, 0.3);
+        }
+        .gas-giant::before {
+            content: '';
+            position: absolute;
+            top: 38px; left: -35px;
+            width: 165px;
+            height: 20px;
+            border: 6px solid rgba(255, 255, 255, 0.15);
+            border-top-color: transparent;
+            border-radius: 50%;
+            transform: rotate(-15deg);
+        }
+        .mystic-moon {
+            top: 15vh;
+            right: 8vw;
+            width: 35px;
+            height: 35px;
+            background: #2d3748;
+            border-radius: 50%;
+            box-shadow: inset -8px -8px 15px rgba(0,0,0,0.9), 0 0 10px rgba(0, 242, 254, 0.15);
+        }
+        .comet {
+            top: 6vh;
+            left: 45vw;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px 2px #fff;
+            animation: shootComet 12s infinite linear;
+            opacity: 0;
+        }
+        .comet::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 2px;
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(to left, rgba(255,255,255,0.7), transparent);
+            transform: translateY(-50%) rotate(-25deg);
+            transform-origin: left center;
+        }
+        .spiral-galaxy {
+            top: 48vh;
+            left: 3vw;
+            width: 70px;
+            height: 30px;
+            background: radial-gradient(ellipse at center, rgba(0, 242, 254, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(2px);
+            transform: rotate(-30deg);
+            animation: rotateRing 25s infinite linear;
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.4);
+        }
+        .star-cluster {
+            top: 50vh;
+            right: 4vw;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            box-shadow: 
+                5px 5px 2px #00ffff, -8px 12px 1px #fff, 12px -5px 3px rgba(0,242,254,0.7),
+                -3px -8px 2px #fff, 8px 15px 1px rgba(112, 0, 255, 0.6);
+            filter: blur(1px);
+            animation: floatingGlow 5s infinite ease-in-out alternate;
+        }
+        .solar-star {
+            bottom: 8vh;
+            left: 8vw;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at center, #fff 20%, #ff7a63 60%, #e85d44 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 25px #ff7a63, 0 0 45px rgba(232, 93, 68, 0.5);
+            animation: floatingGlow 7s infinite ease-in-out;
+        }
+        @keyframes rotateRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes floatingGlow {
+            0% { transform: translateY(0px); filter: brightness(1); }
+            50% { transform: translateY(-8px); filter: brightness(1.2); }
+            100% { transform: translateY(0px); filter: brightness(1); }
+        }
+        @keyframes shootComet {
+            0% { transform: translateX(0) translateY(0); opacity: 0; }
+            5% { opacity: 1; }
+            15% { transform: translateX(-25vw) translateY(12vh); opacity: 0; }
+            100% { transform: translateX(-25vw) translateY(12vh); opacity: 0; }
+        }
+
+        .hero-panel{
+            width:90%;
+            max-width:475px;
+            padding:65px;
+
+            background:
+                linear-gradient(145deg,
+                rgba(8,16,35,.92),
+                rgba(20,35,70,.88));
+
+            border:2px solid rgba(0,242,254,.35);
+            border-radius:30px;
+
+            box-shadow:
+                0 0 20px rgba(0,242,254,.2),
+                0 0 50px rgba(112,0,255,.18),
+                inset 0 0 25px rgba(255,255,255,.03);
+
+            position:relative;
+            overflow:hidden;
+            text-align:center;
+            color:white;
+            z-index:2;
+        }
+
+        .hero-panel::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background:
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent 0px,
+                    transparent 22px,
+                    rgba(0,242,254,.035) 22px,
+                    rgba(0,242,254,.035) 24px
+                );
+            pointer-events:none;
+        }
+
+        .hero-panel::after{
+            content:"";
+            position:absolute;
+            top:-120px;
+            right:-120px;
+            width:260px;
+            height:260px;
+            background:radial-gradient(circle,
+                rgba(0,242,254,.18),
+                transparent 70%);
+            pointer-events:none;
+        }
+
+        .page-badge{
+            display:inline-block;
+
+            padding:8px 18px;
+            margin-bottom:20px;
+
+            background:rgba(255,122,99,.15);
+            color:#ff7a63;
+
+            border-radius:999px;
+
+            font-size:14px;
+            font-weight:700;
+            letter-spacing:1px;
+            text-transform:uppercase;
+        }
+
+        .hero-panel h1{
+            font-size:60px;
+            margin:0;
+            color:white;
+            font-weight:800;
+        }
+
+        .hero-panel h2{
+            margin:10px 0 35px;
+            color:#a7b3c7;
+            font-size:30px;
+            font-weight:500;
+        }
+
+        .hero-panel p{
+            color:#d7dde8;
+            font-size:20px;
+            line-height:1.7;
+            text-align:left;
+            margin:22px 0;
+        }   
+
+        /* Confetti Elements Wrapper */
+        .confetti-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; pointer-events: none;
+            z-index: 1;
+        }
+        .confetti {
+            position: absolute;
+            top: -20px; width: 12px; height: 12px;
+            opacity: 0.4;
+            border-radius: 50%;
+            animation: fall 4s infinite linear;
+        }
+        @media (max-width: 900px) {
+            /* Hides background objects on narrower windows so the screen doesn't clutter */
+            .space-object { display: none; }
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .button-row{
+            display:flex;
+            justify-content:center;
+            gap:20px;
+            margin-top:40px;
+        }
+
+        .btn-main{
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            width:200px;
+            height:65px;
+
+            background:linear-gradient(135deg,#00c6ff,#7000ff);
+
+            color:#fff;
+            text-decoration:none;
+
+            font-size:20px;
+            font-weight:700;
+
+            border:none;
+            border-radius:18px;
+
+            cursor:pointer;
+
+            box-shadow:
+                0 10px 30px rgba(0,0,0,.45),
+                0 0 20px rgba(0,242,254,.25);
+
+            transition:.25s;
+        }
+
+        .btn-main:hover{
+
+            transform:translateY(-3px);
+
+            box-shadow:
+                0 0 30px rgba(0,242,254,.45);
+
+        }
+
+        .popup{
+
+            display:none;
+
+            position:fixed;
+
+            top:0;
+            left:0;
+
+            width:100%;
+            height:100%;
+
+            background:rgba(0,0,0,.75);
+
+            justify-content:center;
+            align-items:center;
+
+            z-index:9999;
+
+            opacity:0;
+
+            transition:opacity .3s ease;
+        }
+
+        .popup.show{
+
+            display:flex;
+
+            opacity:1;
+
+        }
+
+        .popup-content{
+
+            width:700px;
+            max-width:90%;
+
+            padding:45px;
+
+            border-radius:30px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(8,16,35,.96),
+                    rgba(20,35,70,.92)
+                );
+
+            border:2px solid rgba(0,242,254,.35);
+
+            box-shadow:
+                0 0 20px rgba(0,242,254,.2),
+                0 0 50px rgba(112,0,255,.18),
+                inset 0 0 25px rgba(255,255,255,.03);
+
+            position:relative;
+
+            overflow:hidden;
+
+            text-align:center;
+
+            color:white;
+
+            transform:translateY(-40px);
+
+            opacity:0;
+
+            transition:
+                transform .35s ease,
+                opacity .35s ease;
+        }
+
+        .popup.show .popup-content{
+
+            transform:translateY(0);
+
+            opacity:1;
+
+        }
+
+        .popup-content::before{
+
+            content:"";
+
+            position:absolute;
+
+            inset:0;
+
+            background:
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent 0px,
+                    transparent 22px,
+                    rgba(0,242,254,.035) 22px,
+                    rgba(0,242,254,.035) 24px
+                );
+
+            pointer-events:none;
+        }
+
+        .close{
+
+            position:absolute;
+
+            top:18px;
+            right:25px;
+
+            width:45px;
+            height:45px;
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            border-radius:50%;
+
+            background:rgba(255,255,255,.05);
+
+            color:#ffffff;
+
+            font-size:28px;
+
+            cursor:pointer;
+
+            transition:.25s;
+        }
+
+        .popup-content hr{
+
+            border:none;
+
+            height:2px;
+
+            background:rgba(0,242,254,.2);
+
+            margin:25px 0 30px;
+
+        }
+
+        .close:hover{
+
+            background:rgba(255,255,255,.05);
+
+            transform:rotate(90deg) scale(1.1);
+
+            box-shadow:0 0 20px rgba(255,255,255,.05);
+
+        }
+
+        .banner-wrap{
+
+            display:none;
+
+            justify-content:space-between;
+
+            align-items:flex-start;
+
+            width:92%;
+
+            margin:22.5px auto -7.5px;
+
+            opacity:0;
+
+            transform:translateY(-35px);
+
+            transition:
+                opacity .45s ease,
+                transform .45s ease;
+        }
+
+        .banner-wrap.show{
+            display:flex;
+            opacity:1;
+            transform:translateY(0);
+        }
+
+        .quest-banner{
+            position:relative;
+
+            width:180px;
+            min-height:82px;
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            text-align:center;
+
+            padding:12px 14px;
+
+            font-size:17px;
+            font-weight:800;
+            line-height:1.3;
+
+            color:white;
+
+            background:linear-gradient(
+                135deg,
+                #00c6ff,
+                #267dff,
+                #7000ff
+            );
+
+            border:2px solid rgba(255,255,255,.25);
+
+            border-radius:5px;
+
+            box-shadow:
+                0 0 18px rgba(0,198,255,.35),
+                inset 0 1px 0 rgba(255,255,255,.25);
+
+            overflow:visible;
+        }
+
+        /* hanging line */
+
+        .quest-banner::after{
+
+            content:"";
+
+            position:absolute;
+
+            width:4px;
+
+            background:white;
+
+            top:100%;
+
+            left:50%;
+
+            transform:translateX(-50%);
+
+            height:65px;
+        }
+
+        /* left banner */
+
+        .banner-left{
+            margin-left:36px;
+        }
+
+        /* right banner */
+
+        .banner-right{
+            margin-right:36px;
+        }
+
+        .banner-title{
+
+            display:block;
+
+            width:100%;
+        }
+
+        #questTimer{
+
+            display:block;
+
+            margin-top:6px;
+
+            font-size:19px;
+
+            font-weight:900;
+        }
+
+        .quest-card{
+
+            position:relative;
+
+            margin-top:30px;
+            padding:25px;
+
+            border-radius:20px;
+
+            background:rgba(255,255,255,.05);
+
+            border:2px solid rgba(0,242,254,.2);
+
+            text-align:left;
+
+        }
+
+        .quest-slide-out{
+
+            animation:questSlideOut .45s forwards;
+
+        }
+
+        .quest-slide-in{
+
+            animation:questSlideIn .45s forwards;
+
+        }
+
+        @keyframes questSlideOut{
+
+            from{
+
+                opacity:1;
+                transform:translateX(0);
+
+            }
+
+            to{
+
+                opacity:0;
+                transform:translateX(-80px);
+
+            }
+
+        }
+
+        @keyframes questSlideIn{
+
+            from{
+
+                opacity:0;
+                transform:translateX(80px);
+
+            }
+
+            to{
+
+                opacity:1;
+                transform:translateX(0);
+
+            }
+
+        }
+
+        .quest-header{
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            margin-bottom:15px;
+
+        }
+
+        .quest-title{
+
+            font-size:24px;
+
+            font-weight:700;
+
+        }
+
+        .quest-progress-text{
+
+            color:#9fdfff;
+
+            font-weight:bold;
+
+        }
+
+        .progress-bar{
+
+            height:18px;
+
+            background:rgba(255,255,255,.08);
+
+            border-radius:999px;
+
+            overflow:hidden;
+
+        }
+
+        .progress-fill{
+
+            width:0%;
+
+            height:100%;
+
+            border-radius:999px;
+
+            background:linear-gradient(
+                90deg,
+                #00f2fe,
+                #6a49ff
+            );
+
+            transition:width .4s ease;
+
+        }
+
+        .quest-reward{
+
+            margin-top:15px;
+
+            color:#ffd54a;
+
+            font-weight:bold;
+
+        }
+
+        .claim-btn{
+
+            margin-top:18px;
+
+            width:100%;
+
+            padding:14px;
+
+            border:none;
+
+            border-radius:15px;
+
+            cursor:pointer;
+
+            font-size:18px;
+
+            font-weight:bold;
+
+            color:white;
+
+            background:linear-gradient(135deg,#00c6ff,#7000ff);
+
+            box-shadow:0 0 20px rgba(0,255,180,.45);
+
+            transition:.25s;
+
+        }
+
+        .claim-btn:hover{
+
+            transform:scale(1.04);
+
+            box-shadow:0 0 30px rgba(0,255,180,.7);
+
+        }
+
+        .xp-fly{
+
+            position:fixed;
+
+            left:50%;
+            top:50%;
+
+            transform:translate(-50%,-50%);
+
+            font-size:38px;
+
+            font-weight:800;
+
+            color:#ffe44d;
+
+            text-shadow:
+                0 0 12px #ffd000,
+                0 0 25px #ffb300;
+
+            opacity:0;
+
+            pointer-events:none;
+
+            z-index:100000;
+
+        }
+
+        .xp-fly.animate{
+
+            animation:xpFly 1.2s ease forwards;
+
+        }
+
+        @keyframes xpFly{
+
+            0%{
+
+                opacity:0;
+
+                transform:
+                    translate(-50%,-50%)
+                    scale(.5);
+
+            }
+
+            20%{
+
+                opacity:1;
+
+                transform:
+                    translate(-50%,-55%)
+                    scale(1.2);
+
+            }
+
+            100%{
+
+                opacity:0;
+
+                transform:
+                    translate(-50%,-250%)
+                    scale(.8);
+
+            }
+
+        }
+
+        .quest-blue{
+
+            background:
+            linear-gradient(rgba(45,130,255,.18), rgba(45,130,255,.18)),
+            repeating-linear-gradient(
+                -45deg,
+                transparent 0px,
+                transparent 18px,
+                rgba(255,255,255,.04) 18px,
+                rgba(255,255,255,.04) 20px
+            );
+
+            border:2px solid rgba(85,200,255,.55);
+
+        }
+
+        .quest-purple{
+
+            background:
+            linear-gradient(rgba(120,70,220,.20), rgba(120,70,220,.20)),
+            repeating-linear-gradient(
+                -45deg,
+                transparent 0px,
+                transparent 18px,
+                rgba(255,255,255,.04) 18px,
+                rgba(255,255,255,.04) 20px
+            );
+
+            border:2px solid rgba(170,120,255,.55);
+
+        }
+
+        .quest-gold{
+
+            background:
+            linear-gradient(rgba(175,135,35,.22), rgba(175,135,35,.22)),
+            repeating-linear-gradient(
+                -45deg,
+                transparent 0px,
+                transparent 18px,
+                rgba(255,255,255,.04) 18px,
+                rgba(255,255,255,.04) 20px
+            );
+
+            border:2px solid rgba(255,210,90,.55);
+
+        }
+
+        .quest-complete-flash #quest1Bar{
+
+            animation:questGoldFlash .8s;
+
+        }
+
+        @keyframes questGoldFlash{
+
+            0%{
+
+                background:#3aa0ff;
+                transform:scaleX(1);
+                box-shadow:none;
+
+            }
+
+            25%{
+
+                background:#ffd54a;
+
+                box-shadow:
+                0 0 12px #ffd54a,
+                0 0 25px #ffbf00,
+                0 0 40px #ffbf00;
+
+            }
+
+            50%{
+
+                background:#ffe57a;
+
+                box-shadow:
+                0 0 20px #ffe57a,
+                0 0 40px #ffbf00,
+                0 0 60px #ffbf00;
+
+            }
+
+            100%{
+
+                background:#3aa0ff;
+                box-shadow:none;
+
+            }
+
+        }
+
+        .quest-reward-glow{
+
+            animation:rewardGlow .8s forwards;
+
+        }
+
+        @keyframes rewardGlow{
+
+            0%{
+
+                color:white;
+
+                transform:scale(1);
+
+            }
+
+            40%{
+
+                color:#ffd84a;
+
+                text-shadow:
+                0 0 8px #ffd84a,
+                0 0 18px #ffbf00;
+
+                transform:scale(1.08);
+
+            }
+
+            100%{
+
+                color:white;
+
+                transform:scale(1);
+
+                text-shadow:none;
+
+            }
+
+        }
+
+        #questSparkles{
+
+            position:absolute;
+
+            inset:0;
+
+            pointer-events:none;
+
+            overflow:hidden;
+
+        }
+
+        .quest-sparkle{
+
+            position:absolute;
+
+            width:20px;
+            height:20px;
+
+            border-radius:50%;
+
+            background:#ffd84a;
+
+            box-shadow:
+                0 0 8px #ffd84a,
+                0 0 16px #ffbf00;
+
+            animation:sparkleBurst .7s forwards;
+
+        }
+
+        @keyframes sparkleBurst{
+
+            0%{
+
+                opacity:1;
+
+                transform:
+                    translate(0,0)
+                    scale(1);
+
+            }
+
+            100%{
+
+                opacity:0;
+
+                transform:
+                    translate(var(--x), var(--y))
+                    scale(0);
+
+            }
+
+        }
+
+        .banner-wrap.show .quest-banner{
+
+            animation:bannerDrop .45s cubic-bezier(.2,1.2,.3,1);
+        }
+
+        .banner-wrap.show .quest-banner::after{
+
+            animation:lineGrow .35s ease forwards;
+        }
+
+        @keyframes bannerDrop{
+
+            0%{
+
+                transform:translateY(-30px) scale(.9);
+
+                opacity:0;
+            }
+
+            70%{
+
+                transform:translateY(5px) scale(1.03);
+
+                opacity:1;
+            }
+
+            100%{
+
+                transform:translateY(0);
+
+                opacity:1;
+            }
+        }
+
+        @keyframes lineGrow{
+
+            0%{
+
+                height:0;
+            }
+
+            100%{
+
+                height:52px;
+            }
+        }
+
+        </style>
+
+</head>
+<body>
+    <div class="star-field"></div>
+    <div class="space-object black-hole"></div>
+    <div class="space-object gas-giant"></div>
+    <div class="space-object mystic-moon"></div>
+    <div class="space-object comet"></div>
+    <div class="space-object spiral-galaxy"></div>
+    <div class="space-object star-cluster"></div>
+    <div class="space-object solar-star"></div>
+    <div class="hero-panel">
+
+        <div class="page-badge">DAILY CHALLENGES</div>
+    
+        <h1>Quests</h1>
+    
+        <h2>Complete quests and earn XP!</h2>
+    
+        <p>🎯 Finish quests to unlock achievements, gain XP, and track your progress.</p>
+    
+        <p>⭐ After you complete your quests, new quests will appear the next day.</p>
+    
+        <p>🚀 The more XP you earn, the bigger your player level is! </p>
+    
+        <div class="button-row">
+            <button class="btn-main" id="openQuests">View Quests</button>
+            <a href="index.html" class="btn-main">Return Home</a>
+        </div>
+    
+    </div>
+
+    <div id="questPopup" class="popup">
+
+        <div class="popup-content">
+    
+            <span id="closePopup" class="close">&times;</span>
+    
+            <div class="page-badge">
+                DAILY MISSIONS
+            </div>
+    
+            <h1>Quests</h1>
+    
+            <h2>Complete quests and earn XP!</h2>
+
+            <div id="bannerWrap" class="banner-wrap">
+
+                <div class="quest-banner banner-left">
+            
+                    <span class="banner-title">
+                        ✅ ALL DAILY
+                        <br>
+                        QUESTS
+                        <br>
+                        COMPLETE!
+                    </span>
+            
+                </div>
+            
+                <div class="quest-banner banner-right">
+            
+                    <span class="banner-title">
+            
+                        ⏳ NEW QUESTS
+            
+                        <br>
+            
+                        IN
+            
+                        <span id="questTimer">
+            
+                            24:00:00
+            
+                        </span>
+            
+                    </span>
+            
+                </div>
+            
+            </div>
+    
+            <hr>
+    
+            <div class="quest-card" id="questCard">
+
+                <div class="quest-header">
+                    <span class="quest-title" id="quest1Title">
+                        🎮 Play 3 Games
+                    </span>
+                    <span class="quest-progress-text" id="quest1Text">0 / 3</span>
+                </div>
+            
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quest1Bar"></div>
+                </div>
+            
+                <div class="quest-reward" id="quest1Reward">
+                    ⭐ Reward: 100 XP
+                </div>
+                
+                <button
+                    id="quest1Claim"
+                    class="claim-btn"
+                    style="display:none;"
+                >
+                    CLAIM
+                </button>
+
+                <div id="questSparkles"></div>
+            
+            </div>
+    
+        </div>
+    
+    </div>
+    
+        <!-- Confetti elements tracker -->
+        <div class="confetti-container">
+            <div class="confetti" style="left:10%; background: #ff007f; animation-delay: 0s;"></div>
+            <div class="confetti" style="left:30%; background: #00ffff; animation-delay: 2s;"></div>
+            <div class="confetti" style="left:50%; background: #ffff00; animation-delay: 1s;"></div>
+            <div class="confetti" style="left:80%; background: #7000ff; animation-delay: 3s;"></div>
+        </div>
+    
+        <!-- Hanging flag banner -->
+        <svg viewBox="0 0 100 20" style="position: absolute; top: 0; width: 100%; z-index: 3; pointer-events: none;">
+            <path d="M0,0 Q25,12 50,0 Q75,12 100,0" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.2"/>
+            <polygon points="5,2.3 15,4.3 10,12" fill="#ff007f" />
+            <polygon points="25,4.5 35,4.5 30,13" fill="#00ffff" />
+            <polygon points="70,4.5 80,4.5 75,13" fill="#ffff00" />
+            <polygon points="87,2.3 97,4.3 92,12" fill="#7000ff" />
+        </svg>
+
+        <audio id="bg-music" loop preload="auto">
+            <source src="music/home.mp3" type="audio/mpeg">
+        </audio>
+        
+        <script>
+
+        let gamesPlayed = Number(localStorage.getItem("gamesPlayed")) || 0;
+
+        let playerXP = Number(localStorage.getItem("playerXP")) || 0;
+
+        const quests = {
+
+            currentQuest: 0,
+
+            list: [
+
+                {
+                    title: "🎮 Play 3 Games",
+                    reward: 100,
+                    progress: 0,
+                    goal: 3,
+                    type: "gamesPlayed",
+                    theme: "blue",
+                    completed: false,
+                    claimed: false
+                },
+
+                {
+                    title: "🔥 Reach a 10 Streak",
+                    reward: 250,
+                    progress: 0,
+                    goal: 10,
+                    type: "streak",
+                    theme: "purple",
+                    completed: false,
+                    claimed: false
+                },
+
+                {
+                    title: "🌟 Get a Perfect Game",
+                    reward: 500,
+                    progress: 0,
+                    goal: 20,
+                    type: "perfectGame",
+                    theme: "gold",
+                    completed: false,
+                    claimed: false
+                }
+
+            ]
+
+        };
+
+        if (!localStorage.getItem("dailyQuests")) {
+            saveQuests();
+        }
+
+        const savedQuests = localStorage.getItem("dailyQuests");
+
+        if (savedQuests) {
+
+            Object.assign(quests, JSON.parse(savedQuests));
+
+        }
+
+        function saveQuests() {
+
+            localStorage.setItem(
+                "dailyQuests",
+                JSON.stringify(quests)
+            );
+
+        }
+        
+        function startMusic() {
+            const music = document.getElementById("bg-music");
+            music.volume = 1;
+            music.play().catch(() => {});
+        }
+        
+        // start on ANY user interaction
+        document.addEventListener("click", startMusic, { once: true });
+        document.addEventListener("keydown", startMusic, { once: true });
+
+        const buttonClickSound = new Audio("soundeffects/buttonclick.mp3");
+        buttonClickSound.volume = 1;
+
+        const homeButton = document.querySelector('a.btn-main');
+
+        if (homeButton) {
+            homeButton.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                buttonClickSound.currentTime = 0;
+                buttonClickSound.play();
+
+                setTimeout(() => {
+                    window.location.href = homeButton.href;
+                }, 150);
+            });
+        }
+
+        const popup = document.getElementById("questPopup");
+        const openButton = document.getElementById("openQuests");
+        const closeButton = document.getElementById("closePopup");
+
+        openButton.addEventListener("click", () => {
+
+            buttonClickSound.currentTime = 0;
+            buttonClickSound.play();
+
+            popup.style.display = "flex";
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    popup.classList.add("show");
+                });
+            });
+
+        });
+
+        closeButton.addEventListener("click", () => {
+
+            buttonClickSound.currentTime = 0;
+            buttonClickSound.play();
+
+            popup.classList.remove("show");
+
+            setTimeout(() => {
+                popup.style.display = "none";
+            }, 350);
+        });
+
+        window.addEventListener("click", function (event) {
+            if (event.target === popup) {
+
+                buttonClickSound.currentTime = 0;
+                buttonClickSound.play();
+
+                popup.classList.remove("show");
+
+                setTimeout(() => {
+                    popup.style.display = "none";
+                }, 350);
+            }
+        });
+
+        function updateQuestProgress() {
+
+            console.log(quests.list[quests.currentQuest]);
+
+            const quest = quests.list[quests.currentQuest];
+
+            const card = document.getElementById("questCard");
+
+            card.classList.remove(
+                "quest-blue",
+                "quest-purple",
+                "quest-gold"
+            );
+
+        card.classList.add("quest-" + quest.theme);
+
+            document.getElementById("quest1Title").textContent =
+                quest.title;
+
+            document.getElementById("quest1Reward").textContent =
+                "⭐ Reward: " + quest.reward + " XP";
+
+            const percent = (quest.progress / quest.goal) * 100;
+
+            document.getElementById("quest1Bar").style.width =
+                Math.min(percent, 100) + "%";
+
+            document.getElementById("quest1Text").textContent =
+                quest.progress + " / " + quest.goal;
+
+                const reward = document.getElementById("quest1Reward");
+                const claim = document.getElementById("quest1Claim");
+
+                if (quest.completed && !quest.claimed) {
+
+                    reward.textContent = "⭐ " + quest.reward + " XP";
+
+                    claim.style.display = "block";
+
+                }
+                else if (quest.claimed) {
+
+                    reward.textContent = "✅ Claimed";
+
+                    claim.style.display = "none";
+
+                }
+                else{
+
+                    reward.textContent = "⭐ Reward: " + quest.reward + " XP";
+
+                    claim.style.display = "none";
+
+                }
+
+        }
+
+        function claimQuest1() {
+
+            console.log("playerXP before reward =", playerXP);
+
+            console.log("saved previousXP =", localStorage.getItem("previousXP"));
+
+            // Save the XP BEFORE adding the reward
+            localStorage.setItem("previousXP", playerXP);
+
+            const quest = quests.list[quests.currentQuest];
+
+            if (!quest.completed || quest.claimed) return;
+
+                playerXP += quest.reward;
+
+                localStorage.setItem("playerXP", playerXP);
+
+                let pendingXP =
+                    Number(localStorage.getItem("pendingXP")) || 0;
+
+                pendingXP += quest.reward;
+
+                localStorage.setItem("pendingXP", pendingXP);
+
+                playXPAnimation(quest.reward);
+
+                quest.claimed = true;
+
+                saveQuests();
+                updateQuestProgress();
+
+                console.log("Claimed:", quest.claimed);
+
+                const card = document.getElementById("questCard");
+                const reward = document.getElementById("quest1Reward");
+
+                console.log("🟨 Gold flash started");
+                card.classList.add("quest-complete-flash");
+
+                console.log("⭐ Reward glow started");
+                reward.classList.add("quest-reward-glow");
+
+                createQuestSparkles();
+
+                setTimeout(() => {
+
+                    card.classList.remove("quest-complete-flash");
+                    reward.classList.remove("quest-reward-glow");
+
+                    if (quests.currentQuest < quests.list.length - 1) {
+
+                        card.classList.add("quest-slide-out");
+
+                        setTimeout(() => {
+
+                            quests.currentQuest++;
+
+                            saveQuests();
+                            updateQuestProgress();
+
+                            card.classList.remove("quest-slide-out");
+                            card.classList.add("quest-slide-in");
+
+                            setTimeout(() => {
+
+                                card.classList.remove("quest-slide-in");
+
+                            }, 450);
+
+                        }, 450);
+
+                    }
+                    else {
+
+                        saveQuests();
+
+                        updateQuestProgress();
+
+                        showQuestBanners();
+
+                        startQuestCountdown();
+
+                    }
+
+                }, 850);
+        }
+
+        function playXPAnimation(amount){
+
+            const xp = document.getElementById("xpFly");
+
+            xp.textContent = "+" + amount + " XP";
+
+            xp.classList.remove("animate");
+
+            void xp.offsetWidth;
+
+            xp.classList.add("animate");
+
+        }
+
+        function createQuestSparkles(){
+
+            const container =
+                document.getElementById("questSparkles");
+
+            console.log("✨ Creating sparkles...");
+
+            for(let i = 0; i < 12; i++){
+
+                const sparkle =
+                    document.createElement("div");
+
+                sparkle.className = "quest-sparkle";
+
+                sparkle.style.left =
+                    (40 + Math.random() * 20) + "%";
+
+                sparkle.style.top =
+                    (35 + Math.random() * 30) + "%";
+
+                sparkle.style.setProperty(
+                    "--x",
+                    (Math.random() * 140 - 70) + "px"
+                );
+
+                sparkle.style.setProperty(
+                    "--y",
+                    (Math.random() * 140 - 70) + "px"
+                );
+
+                container.appendChild(sparkle);
+
+                console.log("✨ Sparkle #" + (i + 1) + " created");
+
+                sparkle.addEventListener("animationend", () => {
+
+                    console.log("✨ Sparkle #" + (i + 1) + " removed");
+
+                    sparkle.remove();
+
+                });
+
+            }
+
+            console.log("✨ All sparkles created successfully!");
+
+        }
+
+        function showQuestBanners(){
+
+            const wrap = document.getElementById("bannerWrap");
+
+            wrap.style.display = "flex";
+
+            requestAnimationFrame(() => {
+
+                wrap.classList.add("show");
+
+            });
+
+        }
+
+        function startQuestCountdown(){
+
+            let resetTime =
+                Number(localStorage.getItem("questResetTime"));
+
+            if(!resetTime){
+
+                resetTime =
+                    Date.now() + 24 * 60 * 60 * 1000;
+
+                localStorage.setItem(
+                    "questResetTime",
+                    resetTime
+                );
+
+            }
+
+            updateCountdown();
+
+            setInterval(updateCountdown,1000);
+
+        }
+
+        function updateCountdown(){
+
+            const timer =
+                document.getElementById("questTimer");
+
+            let remaining =
+                Number(localStorage.getItem("questResetTime"))
+                - Date.now();
+
+            if(remaining <= 0){
+
+                resetDailyQuests();
+
+                return;
+
+            }
+
+            const hrs =
+                Math.floor(remaining/3600000);
+
+            remaining %= 3600000;
+
+            const mins =
+                Math.floor(remaining/60000);
+
+            remaining %= 60000;
+
+            const secs =
+                Math.floor(remaining/1000);
+
+            timer.textContent =
+                String(hrs).padStart(2,"0")
+                + ":"
+                + String(mins).padStart(2,"0")
+                + ":"
+                + String(secs).padStart(2,"0");
+
+        }
+
+        function resetDailyQuests(){
+
+            localStorage.removeItem("questResetTime");
+
+            quests.currentQuest = 0;
+
+            quests.list.forEach(q=>{
+
+                q.progress = 0;
+
+                q.completed = false;
+
+                q.claimed = false;
+
+            });
+
+            saveQuests();
+
+            document
+                .getElementById("bannerWrap")
+                .classList.remove("show");
+
+            document
+                .getElementById("bannerWrap")
+                .style.display = "none";
+
+            updateQuestProgress();
+
+        }
+
+        const allClaimed = quests.list.every(q => q.claimed);
+
+        if (allClaimed) {
+
+            showQuestBanners();
+
+            startQuestCountdown();
+
+        }
+
+        updateQuestProgress();
+
+        document.getElementById("quest1Claim").addEventListener("click", claimQuest1);
+
+        </script>
+        
+        <div id="xpFly" class="xp-fly">+100 XP</div>
+
+</body>
+</html>
